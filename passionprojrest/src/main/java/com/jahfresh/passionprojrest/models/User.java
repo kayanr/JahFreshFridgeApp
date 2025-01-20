@@ -1,4 +1,4 @@
-package com.jahfresh.passionprojrest.Models;
+package com.jahfresh.passionprojrest.models;
 
 import jakarta.persistence.*;
 

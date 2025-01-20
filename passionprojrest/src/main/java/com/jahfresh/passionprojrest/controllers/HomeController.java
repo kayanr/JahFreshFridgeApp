@@ -1,13 +1,8 @@
-package com.jahfresh.passionprojrest.Controller;
+package com.jahfresh.passionprojrest.controllers;
 
 
-import com.jahfresh.passionprojrest.Models.User;
-import com.jahfresh.passionprojrest.Repo.UserRepo;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
 
 @Controller
 public class HomeController {
