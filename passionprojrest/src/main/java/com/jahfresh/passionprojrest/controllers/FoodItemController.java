@@ -39,7 +39,7 @@ public class FoodItemController {
         return "Saved...";
     }*/
 
-    @GetMapping("/fooditem/create")
+    @GetMapping("/create")
     public String createFoodItem(Model model) {
         FoodItemDto foodItemDto = new FoodItemDto();
         model.addAttribute("foodItemDto", foodItemDto);
@@ -47,11 +47,11 @@ public class FoodItemController {
         return "fooditems/create";
     }
 
-    /*@PostMapping("/create")
+    @PostMapping("/create")
         public String createFoodIem(){
-          return "redirect:/fooditems/create";
+          return "redirect:/fooditems";
         }
-*/
+
 
     @PutMapping(value = "/fooditem/update/{id}")
     public String updateFoodItem(@PathVariable long id, @RequestBody FoodItem foodItem){
