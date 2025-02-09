@@ -53,7 +53,7 @@ public class FoodItemController {
         }
 
 
-    @PutMapping(value = "/fooditem/update/{id}")
+   /* @PutMapping(value = "/fooditem/update/{id}")
     public String updateFoodItem(@PathVariable long id, @RequestBody FoodItem foodItem){
         FoodItem updateFoodItem = foodItemRepo.findById(id).get();
         updateFoodItem.setName(foodItem.getName());
@@ -63,6 +63,26 @@ public class FoodItemController {
         foodItemRepo.save(updateFoodItem);
 
         return "Food item updated...";
+    }*/
+
+    @GetMapping("/edit")
+    public String editFoodItem(Model model, @RequestParam Long id) {
+
+        FoodItem foodItem = foodItemRepo.findById(id).orElse(null);
+        if(foodItem == null) {
+            return "redirect:/fooditems";
+        }
+
+        FoodItemDto foodItemDto = new FoodItemDto();
+        foodItemDto.setName(foodItem.getName());
+        foodItemDto.setDescription(foodItem.getDescription());
+        foodItemDto.setExpiryDate(foodItem.getExpiryDate());
+        foodItemDto.setQuantity(foodItem.getQuantity());
+
+        model.addAttribute("foodItem", foodItem);
+        model.addAttribute("foodItemDto", foodItemDto);
+
+        return "fooditems/edit";
     }
 
     @DeleteMapping(value = "/fooditem/delete/{id}")
