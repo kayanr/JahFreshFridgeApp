@@ -15,6 +15,15 @@ public class HomeController {
             return "index";
     }
 
+    @GetMapping( "/contact")
+    public String contact(){
+        return "contact";
+    }
+    @GetMapping( "/privacy")
+    public String privacy(){
+        return "privacy";
+    }
+
  /*  @GetMapping(value="/users")
     public List<User> getUsers(){
         return userRepo.findAll();
