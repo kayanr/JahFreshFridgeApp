@@ -35,7 +35,17 @@ public class FoodItemController {
     }
 
     @PostMapping("/create")
-        public String createFoodIem(){
+        public String createFoodIem(@Valid FoodItemDto foodItemDto, BindingResult bindingResult) {
+            if(bindingResult.hasErrors()) {
+                return "fooditems/create";
+            }
+
+            FoodItem foodItem = new FoodItem();
+            foodItem.setName(foodItemDto.getName());
+            foodItem.setDescription(foodItemDto.getDescription());
+            foodItem.setExpiryDate(foodItemDto.getExpiryDate());
+            foodItem.setQuantity(foodItemDto.getQuantity());
+            foodItemRepo.save(foodItem);
           return "redirect:/fooditems";
         }
 
