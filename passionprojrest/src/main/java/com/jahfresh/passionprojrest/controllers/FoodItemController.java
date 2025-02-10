@@ -7,7 +7,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
+
+import javax.validation.Valid;
 
 @Controller
 @RequestMapping("/fooditems")
@@ -83,6 +86,29 @@ public class FoodItemController {
         model.addAttribute("foodItemDto", foodItemDto);
 
         return "fooditems/edit";
+    }
+
+    @PostMapping ("/edit")
+    public String editFoodItem(Model model, @RequestParam Long id, @Valid FoodItemDto foodItemDto, BindingResult bindingResult) {
+
+        FoodItem foodItem = foodItemRepo.findById(id).orElse(null);
+        if(foodItem == null) {
+            return "redirect:/fooditems";
+        }
+        model.addAttribute("foodItem", foodItem);
+
+        if(bindingResult.hasErrors()) {
+            return "fooditems/edit";
+        }
+
+        //Update food item details
+        foodItem.setName(foodItemDto.getName());
+        foodItem.setDescription(foodItemDto.getDescription());
+        foodItem.setExpiryDate(foodItemDto.getExpiryDate());
+        foodItem.setQuantity(foodItemDto.getQuantity());
+
+        foodItemRepo.save(foodItem);
+        return "redirect:/fooditems";
     }
 
     @DeleteMapping(value = "/fooditem/delete/{id}")
