@@ -111,14 +111,22 @@ public class FoodItemController {
         return "redirect:/fooditems";
     }
 
-    @DeleteMapping(value = "/fooditem/delete/{id}")
+/*    @DeleteMapping(value = "/fooditem/delete/{id}")
     public String deleteFoodItem(@PathVariable long id){
         FoodItem deleteFoodItem = foodItemRepo.findById(id).get();
         foodItemRepo.delete(deleteFoodItem);
 
         return "Deleted food item with the id: "+id;
+    }*/
+
+    @GetMapping("/delete")
+    public String deleteFoodItem(@RequestParam Long id){
+        FoodItem foodItem = foodItemRepo.findById(id).orElse(null);
+       if(foodItem != null) {
+           foodItemRepo.delete(foodItem);
+       }
+
+        return "redirect:/fooditems";
     }
-
-
 
 }
