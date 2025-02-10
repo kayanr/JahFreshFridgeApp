@@ -19,28 +19,12 @@ public class FoodItemController {
     @Autowired
     private FoodItemRepo foodItemRepo;
 
- /*   @GetMapping(value = "/foo")
-    public String getPage(){
-        return "index";
-    }*/
-
     @GetMapping({"","/"})
     public String getFoodItems(Model model) {
         var foodItems = foodItemRepo.findAll(Sort.by(Sort.Direction.DESC, "id"));
         model.addAttribute("fooditems", foodItems);
         return "fooditems/index";
     }
-
-       /* @GetMapping("/users")
-        public String listUsers(Model model) {
-            model.addAttribute("users", userRepo.getAllUsers());
-            return "users"; }*/
-
-   /* @PostMapping(value = "/fooditem/save")
-    public String saveUser(@RequestBody FoodItem foodItem){
-        foodItemRepo.save(foodItem);
-        return "Saved...";
-    }*/
 
     @GetMapping("/create")
     public String createFoodItem(Model model) {
@@ -55,22 +39,8 @@ public class FoodItemController {
           return "redirect:/fooditems";
         }
 
-
-   /* @PutMapping(value = "/fooditem/update/{id}")
-    public String updateFoodItem(@PathVariable long id, @RequestBody FoodItem foodItem){
-        FoodItem updateFoodItem = foodItemRepo.findById(id).get();
-        updateFoodItem.setName(foodItem.getName());
-        updateFoodItem.setDescription(foodItem.getDescription());
-        updateFoodItem.setExpiryDate(foodItem.getExpiryDate());
-        updateFoodItem.setQuantity(foodItem.getQuantity());
-        foodItemRepo.save(updateFoodItem);
-
-        return "Food item updated...";
-    }*/
-
     @GetMapping("/edit")
     public String editFoodItem(Model model, @RequestParam Long id) {
-
         FoodItem foodItem = foodItemRepo.findById(id).orElse(null);
         if(foodItem == null) {
             return "redirect:/fooditems";
@@ -90,7 +60,6 @@ public class FoodItemController {
 
     @PostMapping ("/edit")
     public String editFoodItem(Model model, @RequestParam Long id, @Valid FoodItemDto foodItemDto, BindingResult bindingResult) {
-
         FoodItem foodItem = foodItemRepo.findById(id).orElse(null);
         if(foodItem == null) {
             return "redirect:/fooditems";
@@ -110,14 +79,6 @@ public class FoodItemController {
         foodItemRepo.save(foodItem);
         return "redirect:/fooditems";
     }
-
-/*    @DeleteMapping(value = "/fooditem/delete/{id}")
-    public String deleteFoodItem(@PathVariable long id){
-        FoodItem deleteFoodItem = foodItemRepo.findById(id).get();
-        foodItemRepo.delete(deleteFoodItem);
-
-        return "Deleted food item with the id: "+id;
-    }*/
 
     @GetMapping("/delete")
     public String deleteFoodItem(@RequestParam Long id){
