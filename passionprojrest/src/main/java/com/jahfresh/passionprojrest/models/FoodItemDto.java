@@ -1,11 +1,15 @@
 package com.jahfresh.passionprojrest.models;
 
 
+import java.time.LocalDate;
+import java.util.Date;
+
 public class FoodItemDto {
 
     private String name;
     private String description;
-    private String expiryDate;
+    private Date expiryDate;
+    private Date createdDate;
     private int quantity;
 
     public String getName() {
@@ -24,12 +28,20 @@ public class FoodItemDto {
         this.description = description;
     }
 
-    public String getExpiryDate() {
+    public Date getExpiryDate() {
         return expiryDate;
     }
 
-    public void setExpiryDate(String expiryDate) {
+    public void setExpiryDate(Date expiryDate) {
         this.expiryDate = expiryDate;
+    }
+
+    public Date getCreatedDate() {
+        return createdDate;
+    }
+
+    public void setCreatedDate(Date createdDate) {
+        this.createdDate = createdDate;
     }
 
     public int getQuantity() {

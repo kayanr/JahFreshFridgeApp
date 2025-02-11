@@ -2,18 +2,26 @@ package com.jahfresh.passionprojrest.models;
 
 import jakarta.persistence.*;
 
+import java.time.LocalDate;
+import java.util.Date;
+
 @Entity
 @Table(name = "foodItems")
 public class FoodItem {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
 
     private String name;
     private String description;
-    private String expiryDate;
+
+    private Date expiryDate;
+    private Date createdDate;
     private int quantity;
+
+    @Enumerated(EnumType.STRING)
+    private FoodStatus status;
 
     public Long getId() {
         return id;
@@ -39,12 +47,20 @@ public class FoodItem {
         this.description = description;
     }
 
-    public String getExpiryDate() {
+    public Date getExpiryDate() {
         return expiryDate;
     }
 
-    public void setExpiryDate(String expiryDate) {
+    public void setExpiryDate(Date expiryDate) {
         this.expiryDate = expiryDate;
+    }
+
+    public Date getCreatedDate() {
+        return createdDate;
+    }
+
+    public void setCreatedDate(Date createdDate) {
+        this.createdDate = createdDate;
     }
 
     public int getQuantity() {
@@ -55,6 +71,11 @@ public class FoodItem {
         this.quantity = quantity;
     }
 
+    public FoodStatus getStatus() {
+        return status;
+    }
 
-
+    public void setStatus(FoodStatus status) {
+        this.status = status;
+    }
 }

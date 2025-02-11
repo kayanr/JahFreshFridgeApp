@@ -14,17 +14,21 @@
             <th>Name</th>
             <th>Description</th>
             <th>Expiry Date</th>
+            <th>Created Date</th>
             <th>Quantity</th>
+            <th>Status</th>
             <th>Action</th>
         </tr>
         </thead>
         <tbody class="table-group-divider">
         <tr th:each="fooditem : ${fooditems}">
-            <td th:text="${fooditem.id}">ID</td>
-            <td th:text="${fooditem.name}">Name</td>
-            <td th:text="${fooditem.description}">Description</td>
-            <td th:text="${fooditem.expiryDate}">Expiry Date</td>
-            <td th:text="${fooditem.quantity}">Quantity</td>
+            <td th:text="${fooditem.id}"></td>
+            <td th:text="${fooditem.name}"></td>
+            <td th:text="${fooditem.description}"></td>
+            <td th:text="${fooditem.expiryDate.toString().substring(0, 10)}"></td>
+            <td th:text="${fooditem.createdDate.toString().substring(0, 10)}"></td>
+            <td th:text="${fooditem.quantity}"></td>
+            <td th:text="${fooditem.status}"></td>
             <td style="white-space: nowrap">
             <a class="btn btn-primary btn-sm" th:href="@{/fooditems/edit(id=${fooditem.id})}">
                 Edit
