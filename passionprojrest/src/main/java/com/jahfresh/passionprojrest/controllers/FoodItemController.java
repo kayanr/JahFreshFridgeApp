@@ -11,6 +11,7 @@ import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
+import java.util.Date;
 
 @Controller
 @RequestMapping("/fooditems")
@@ -41,10 +42,13 @@ public class FoodItemController {
             }
 
             FoodItem foodItem = new FoodItem();
+
+            Date today = new Date();
             foodItem.setName(foodItemDto.getName());
             foodItem.setDescription(foodItemDto.getDescription());
             foodItem.setExpiryDate(foodItemDto.getExpiryDate());
             foodItem.setQuantity(foodItemDto.getQuantity());
+            foodItem.setCreatedDate(today);
             foodItemRepo.save(foodItem);
           return "redirect:/fooditems";
         }

@@ -2,7 +2,6 @@ package com.jahfresh.passionprojrest.models;
 
 import jakarta.persistence.*;
 
-import java.time.LocalDate;
 import java.util.Date;
 
 @Entity
