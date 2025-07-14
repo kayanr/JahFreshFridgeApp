@@ -10,6 +10,7 @@ public class FoodItemDto {
     private String description;
     private Date expiryDate;
     private Date createdDate;
+    private Date updatedDate;
     private int quantity;
 
     public String getName() {
@@ -42,6 +43,13 @@ public class FoodItemDto {
 
     public void setCreatedDate(Date createdDate) {
         this.createdDate = createdDate;
+    }
+    public Date getUpdatedDate() {
+        return updatedDate;
+    }
+
+    public void setUpdatedDate(Date updatedDate) {
+        this.updatedDate = updatedDate;
     }
 
     public int getQuantity() {
