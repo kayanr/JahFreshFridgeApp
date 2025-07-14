@@ -25,10 +25,10 @@
             <td th:text="${fooditem.id}"></td>
             <td th:text="${fooditem.name}"></td>
             <td th:text="${fooditem.description}"></td>
-            <td th:text="${fooditem.expiryDate.toString().substring(0, 10)}"></td>
-            <td th:text="${fooditem.createdDate.toString().substring(0, 10)}"></td>
+            <td th:text="${fooditem.expiryDate}"></td>
+            <td th:text="${fooditem.createdDate}"></td>
             <td th:text="${fooditem.quantity}"></td>
-            <td th:text="${fooditem.status}"></td>
+            <td > Status Placeholder</td>
             <td style="white-space: nowrap">
             <a class="btn btn-primary btn-sm" th:href="@{/fooditems/edit(id=${fooditem.id})}">
                 Edit
