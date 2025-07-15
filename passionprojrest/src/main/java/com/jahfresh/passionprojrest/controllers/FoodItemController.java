@@ -2,6 +2,7 @@ package com.jahfresh.passionprojrest.controllers;
 
 import com.jahfresh.passionprojrest.models.FoodItem;
 import com.jahfresh.passionprojrest.models.FoodItemDto;
+import com.jahfresh.passionprojrest.models.FoodStatus;
 import com.jahfresh.passionprojrest.repositories.FoodItemRepo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Sort;
@@ -31,6 +32,7 @@ public class FoodItemController {
     public String createFoodItem(Model model) {
         FoodItemDto foodItemDto = new FoodItemDto();
         model.addAttribute("foodItemDto", foodItemDto);
+        model.addAttribute("statuses", FoodStatus.values());
         //foodItemRepo.save(foodItem);
         return "fooditems/create";
     }
@@ -49,6 +51,7 @@ public class FoodItemController {
             foodItem.setExpiryDate(foodItemDto.getExpiryDate());
             foodItem.setQuantity(foodItemDto.getQuantity());
             foodItem.setCreatedDate(today);
+            foodItem.setStatus(foodItemDto.getStatus());
             foodItemRepo.save(foodItem);
           return "redirect:/fooditems";
         }

@@ -12,6 +12,7 @@ public class FoodItemDto {
     private Date createdDate;
     private Date updatedDate;
     private int quantity;
+    private FoodStatus status;
 
     public String getName() {
         return name;
@@ -59,4 +60,8 @@ public class FoodItemDto {
     public void setQuantity(int quantity) {
         this.quantity = quantity;
     }
+
+    public FoodStatus getStatus() { return status; }
+
+    public void setStatus(FoodStatus status) { this.status = status; }
 }
