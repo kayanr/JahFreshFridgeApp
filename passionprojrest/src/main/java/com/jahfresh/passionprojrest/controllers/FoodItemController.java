@@ -65,6 +65,7 @@ public class FoodItemController {
         foodItemDto.setDescription(foodItem.getDescription());
         foodItemDto.setExpiryDate(foodItem.getExpiryDate());
         foodItemDto.setQuantity(foodItem.getQuantity());
+        foodItemDto.setUpdatedDate(foodItem.getUpdatedDate());
 
         model.addAttribute("foodItem", foodItem);
         model.addAttribute("foodItemDto", foodItemDto);
@@ -88,6 +89,7 @@ public class FoodItemController {
         foodItem.setName(foodItemDto.getName());
         foodItem.setDescription(foodItemDto.getDescription());
         foodItem.setExpiryDate(foodItemDto.getExpiryDate());
+        foodItem.setUpdatedDate(new Date());
         foodItem.setQuantity(foodItemDto.getQuantity());
 
         foodItemRepo.save(foodItem);
