@@ -69,9 +69,10 @@ public class FoodItemController {
         foodItemDto.setExpiryDate(foodItem.getExpiryDate());
         foodItemDto.setQuantity(foodItem.getQuantity());
         foodItemDto.setUpdatedDate(foodItem.getUpdatedDate());
-
+        foodItemDto.setStatus(foodItem.getStatus());
         model.addAttribute("foodItem", foodItem);
         model.addAttribute("foodItemDto", foodItemDto);
+        model.addAttribute("statuses", FoodStatus.values());
 
         return "fooditems/edit";
     }
@@ -83,6 +84,7 @@ public class FoodItemController {
             return "redirect:/fooditems";
         }
         model.addAttribute("foodItem", foodItem);
+        model.addAttribute("statuses", FoodStatus.values());
 
         if(bindingResult.hasErrors()) {
             return "fooditems/edit";
@@ -94,6 +96,7 @@ public class FoodItemController {
         foodItem.setExpiryDate(foodItemDto.getExpiryDate());
         foodItem.setUpdatedDate(new Date());
         foodItem.setQuantity(foodItemDto.getQuantity());
+        foodItem.setStatus(foodItemDto.getStatus());
 
         foodItemRepo.save(foodItem);
         return "redirect:/fooditems";
