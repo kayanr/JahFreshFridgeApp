@@ -1,6 +1,7 @@
 package com.jahfresh.passionprojrest.models;
 
 
+import org.springframework.format.annotation.DateTimeFormat;
 import java.time.LocalDate;
 import java.util.Date;
 
@@ -8,7 +9,8 @@ public class FoodItemDto {
 
     private String name;
     private String description;
-    private Date expiryDate;
+    @DateTimeFormat(pattern = "MM/dd/yyyy")
+    private LocalDate expiryDate;
     private Date createdDate;
     private Date updatedDate;
     private int quantity;
@@ -30,11 +32,11 @@ public class FoodItemDto {
         this.description = description;
     }
 
-    public Date getExpiryDate() {
+    public LocalDate getExpiryDate() {
         return expiryDate;
     }
 
-    public void setExpiryDate(Date expiryDate) {
+    public void setExpiryDate(LocalDate expiryDate) {
         this.expiryDate = expiryDate;
     }
 

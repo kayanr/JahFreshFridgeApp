@@ -2,6 +2,7 @@ package com.jahfresh.passionprojrest.models;
 
 import jakarta.persistence.*;
 
+import java.time.LocalDate;
 import java.util.Date;
 
 @Entity
@@ -14,7 +15,7 @@ public class FoodItem {
 
     private String name;
     private String description;
-    private Date expiryDate;
+    private LocalDate expiryDate;
     private Date createdDate;
     private Date updatedDate;
     private int quantity;
@@ -46,11 +47,11 @@ public class FoodItem {
         this.description = description;
     }
 
-    public Date getExpiryDate() {
+    public LocalDate getExpiryDate() {
         return expiryDate;
     }
 
-    public void setExpiryDate(Date expiryDate) {
+    public void setExpiryDate(LocalDate expiryDate) {
         this.expiryDate = expiryDate;
     }
 
