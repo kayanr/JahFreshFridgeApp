@@ -41,11 +41,11 @@
                     <div class="col-sm-8">
                         <input type="date"
                                class="form-control"
-                               th:field="${foodItemDto.expiryDate}"
+                               th:value="${foodItemDto.expiryDate != null ? foodItemDto.expiryDate.toString() : ''}"
                                 name="expiryDate">
                         <p th:if="${#fields.hasErrors('expiryDate')}"
                            th:errorclass="text-danger"
-                           th:errors="${foodItemDto.expiryDate}">
+                           th:errors="*{expiryDate}">
                         </p>
 
                     </div>
