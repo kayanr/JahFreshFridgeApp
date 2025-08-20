@@ -26,9 +26,9 @@
             <td th:text="${fooditem.id}"></td>
             <td th:text="${fooditem.name}"></td>
             <td th:text="${fooditem.description}"></td>
-            <td th:text="${fooditem.expiryDate}"></td>
-            <td th:text="${fooditem.createdDate}"></td>
-            <td th:text="${fooditem.updatedDate}"></td>
+            <td th:text="${#dates.format(fooditem.expiryDate, 'MM/dd/yyyy')}"></td>
+            <td th:text="${#dates.format(fooditem.createdDate, 'MM/dd/yyyy')}"></td>
+            <td th:text="${#dates.format(fooditem.updatedDate, 'MM/dd/yyyy')}"></td>
             <td th:text="${fooditem.quantity}"></td>
             <td th:text="${fooditem.status}"></td>
             <td style="white-space: nowrap">
