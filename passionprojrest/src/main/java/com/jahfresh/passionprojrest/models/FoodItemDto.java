@@ -9,7 +9,7 @@ public class FoodItemDto {
 
     private String name;
     private String description;
-    @DateTimeFormat(pattern = "MM/dd/yyyy")
+    @DateTimeFormat(pattern = "yyyy-MM-dd")
     private LocalDate expiryDate;
     private Date createdDate;
     private Date updatedDate;
