@@ -34,6 +34,26 @@
     <!-- Alert area for success/error messages -->
     <div id="alert-container"></div>
 
+    <!-- Search and filter controls -->
+    <div class="row g-2 mb-3">
+        <div class="col-md-6">
+            <input type="text" class="form-control" id="search-input" placeholder="Search by name...">
+        </div>
+        <div class="col-md-4">
+            <select class="form-select" id="filter-status">
+                <option value="">All Statuses</option>
+                <option value="FRESH">Fresh</option>
+                <option value="EXPIRING_SOON">Expiring Soon</option>
+                <option value="EXPIRED">Expired</option>
+                <option value="CONSUMED">Consumed</option>
+                <option value="DISCARDED">Discarded</option>
+            </select>
+        </div>
+        <div class="col-md-2">
+            <button class="btn btn-outline-secondary w-100" id="btn-clear-filters">Clear</button>
+        </div>
+    </div>
+
     <!-- Food Items Table -->
     <div class="table-responsive">
         <table class="table table-hover align-middle">
