@@ -5,6 +5,9 @@ const deleteModal = new bootstrap.Modal(document.getElementById('deleteModal'));
 // Track which item is pending deletion
 let deleteTargetId = null;
 
+// In-memory store of all loaded items — used for filtering without extra API calls
+let allItems = [];
+
 // Status badge colours and display labels
 const STATUS_BADGE = {
     FRESH:          'bg-success',
@@ -51,10 +54,12 @@ function renderTable(items) {
     const tbody = document.getElementById('fooditems-table-body');
 
     if (items.length === 0) {
+        const isFiltering = document.getElementById('search-input').value ||
+                            document.getElementById('filter-status').value;
         tbody.innerHTML = `
             <tr>
                 <td colspan="8" class="text-center text-muted py-4">
-                    No food items yet. Add one!
+                    ${isFiltering ? 'No items match your search.' : 'No food items yet. Add one!'}
                 </td>
             </tr>`;
         return;
@@ -88,8 +93,8 @@ function renderTable(items) {
 async function loadFoodItems() {
     const tbody = document.getElementById('fooditems-table-body');
     try {
-        const items = await getAllFoodItems();
-        renderTable(items);
+        allItems = await getAllFoodItems();
+        applyFilters();
     } catch (error) {
         tbody.innerHTML = `
             <tr>
@@ -98,6 +103,21 @@ async function loadFoodItems() {
                 </td>
             </tr>`;
     }
+}
+
+// ── Search & Filter ─────────────────────────────────────────────────────────
+
+function applyFilters() {
+    const search = document.getElementById('search-input').value.toLowerCase().trim();
+    const status = document.getElementById('filter-status').value;
+
+    const filtered = allItems.filter(item => {
+        const matchesSearch = !search || item.name.toLowerCase().includes(search);
+        const matchesStatus = !status || item.status === status;
+        return matchesSearch && matchesStatus;
+    });
+
+    renderTable(filtered);
 }
 
 // ── Add modal ──────────────────────────────────────────────────────────────
@@ -180,6 +200,14 @@ async function confirmDelete() {
 }
 
 // ── Event listeners ────────────────────────────────────────────────────────
+
+document.getElementById('search-input').addEventListener('input', applyFilters);
+document.getElementById('filter-status').addEventListener('change', applyFilters);
+document.getElementById('btn-clear-filters').addEventListener('click', () => {
+    document.getElementById('search-input').value = '';
+    document.getElementById('filter-status').value = '';
+    applyFilters();
+});
 
 document.getElementById('btn-add-item').addEventListener('click', openAddModal);
 document.getElementById('btn-save-item').addEventListener('click', saveItem);
