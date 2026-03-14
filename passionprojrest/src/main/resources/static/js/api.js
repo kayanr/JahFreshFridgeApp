@@ -45,3 +45,9 @@ async function refreshStatuses() {
     });
     if (!response.ok) throw new Error('Failed to refresh statuses');
 }
+
+async function getStats() {
+    const response = await fetch(`${BASE_URL}/stats`);
+    if (!response.ok) throw new Error('Failed to load stats');
+    return response.json();
+}
