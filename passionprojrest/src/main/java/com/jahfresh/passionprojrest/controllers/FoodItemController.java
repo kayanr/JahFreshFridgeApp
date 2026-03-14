@@ -2,6 +2,7 @@ package com.jahfresh.passionprojrest.controllers;
 
 import com.jahfresh.passionprojrest.models.FoodItem;
 import com.jahfresh.passionprojrest.models.FoodItemDto;
+import com.jahfresh.passionprojrest.models.FoodStatus;
 import com.jahfresh.passionprojrest.repositories.FoodItemRepo;
 import com.jahfresh.passionprojrest.services.FoodItemService;
 import jakarta.validation.Valid;
@@ -12,7 +13,9 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Date;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api/fooditems")
@@ -81,5 +84,18 @@ public class FoodItemController {
     public ResponseEntity<Void> refreshStatuses() {
         foodItemService.updateExpiryStatuses();
         return ResponseEntity.noContent().build();
+    }
+
+    @GetMapping("/stats")
+    public Map<String, Long> getStats() {
+        Map<String, Long> stats = new LinkedHashMap<>();
+        long total = 0;
+        for (FoodStatus status : FoodStatus.values()) {
+            long count = foodItemRepo.countByStatus(status);
+            stats.put(status.name(), count);
+            total += count;
+        }
+        stats.put("total", total);
+        return stats;
     }
 }
