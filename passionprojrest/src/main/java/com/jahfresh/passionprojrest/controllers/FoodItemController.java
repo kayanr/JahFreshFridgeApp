@@ -2,115 +2,74 @@ package com.jahfresh.passionprojrest.controllers;
 
 import com.jahfresh.passionprojrest.models.FoodItem;
 import com.jahfresh.passionprojrest.models.FoodItemDto;
-import com.jahfresh.passionprojrest.models.FoodStatus;
 import com.jahfresh.passionprojrest.repositories.FoodItemRepo;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Sort;
-import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
-import org.springframework.validation.BindingResult;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import jakarta.validation.Valid;
 import java.util.Date;
+import java.util.List;
 
-@Controller
-@RequestMapping("/fooditems")
+@RestController
+@RequestMapping("/api/fooditems")
 public class FoodItemController {
 
     @Autowired
     private FoodItemRepo foodItemRepo;
 
-    @GetMapping({"","/"})
-    public String getFoodItems(Model model) {
-        var foodItems = foodItemRepo.findAll(Sort.by(Sort.Direction.DESC, "id"));
-        model.addAttribute("fooditems", foodItems);
-        return "fooditems/index";
+    @GetMapping
+    public List<FoodItem> getFoodItems() {
+        return foodItemRepo.findAll(Sort.by(Sort.Direction.DESC, "id"));
     }
 
-    @GetMapping("/create")
-    public String createFoodItem(Model model) {
-        FoodItemDto foodItemDto = new FoodItemDto();
-        model.addAttribute("foodItemDto", foodItemDto);
-        model.addAttribute("statuses", FoodStatus.values());
-        //foodItemRepo.save(foodItem);
-        return "fooditems/create";
-    }
-
-    @PostMapping("/create")
-        public String createFoodIem(Model model, @Valid FoodItemDto foodItemDto, BindingResult bindingResult) {
-            if(bindingResult.hasErrors()) {
-                model.addAttribute("statuses", FoodStatus.values());
-                return "fooditems/create";
-            }
-
-            FoodItem foodItem = new FoodItem();
-
-            Date today = new Date();
-            foodItem.setName(foodItemDto.getName());
-            foodItem.setDescription(foodItemDto.getDescription());
-            foodItem.setExpiryDate(foodItemDto.getExpiryDate());
-            foodItem.setQuantity(foodItemDto.getQuantity());
-            foodItem.setCreatedDate(today);
-            foodItem.setStatus(foodItemDto.getStatus());
-            foodItemRepo.save(foodItem);
-          return "redirect:/fooditems";
-        }
-
-    @GetMapping("/edit")
-    public String editFoodItem(Model model, @RequestParam Long id) {
+    @GetMapping("/{id}")
+    public ResponseEntity<FoodItem> getFoodItem(@PathVariable Long id) {
         FoodItem foodItem = foodItemRepo.findById(id).orElse(null);
-        if(foodItem == null) {
-            return "redirect:/fooditems";
+        if (foodItem == null) {
+            return ResponseEntity.notFound().build();
         }
-
-        FoodItemDto foodItemDto = new FoodItemDto();
-        foodItemDto.setName(foodItem.getName());
-        foodItemDto.setDescription(foodItem.getDescription());
-        foodItemDto.setExpiryDate(foodItem.getExpiryDate());
-        foodItemDto.setQuantity(foodItem.getQuantity());
-        foodItemDto.setUpdatedDate(foodItem.getUpdatedDate());
-        foodItemDto.setStatus(foodItem.getStatus());
-        model.addAttribute("foodItem", foodItem);
-        model.addAttribute("foodItemDto", foodItemDto);
-        model.addAttribute("statuses", FoodStatus.values());
-
-        return "fooditems/edit";
+        return ResponseEntity.ok(foodItem);
     }
 
-    @PostMapping ("/edit")
-    public String editFoodItem(Model model, @RequestParam Long id, @Valid FoodItemDto foodItemDto, BindingResult bindingResult) {
-        FoodItem foodItem = foodItemRepo.findById(id).orElse(null);
-        if(foodItem == null) {
-            return "redirect:/fooditems";
-        }
-        model.addAttribute("foodItem", foodItem);
-        model.addAttribute("statuses", FoodStatus.values());
-
-        if(bindingResult.hasErrors()) {
-            return "fooditems/edit";
-        }
-
-        //Update food item details
+    @PostMapping
+    public ResponseEntity<FoodItem> createFoodItem(@Valid @RequestBody FoodItemDto foodItemDto) {
+        FoodItem foodItem = new FoodItem();
         foodItem.setName(foodItemDto.getName());
         foodItem.setDescription(foodItemDto.getDescription());
         foodItem.setExpiryDate(foodItemDto.getExpiryDate());
-        foodItem.setUpdatedDate(new Date());
         foodItem.setQuantity(foodItemDto.getQuantity());
         foodItem.setStatus(foodItemDto.getStatus());
-
+        foodItem.setCreatedDate(new Date());
         foodItemRepo.save(foodItem);
-        return "redirect:/fooditems";
+        return ResponseEntity.status(HttpStatus.CREATED).body(foodItem);
     }
 
-    @GetMapping("/delete")
-    public String deleteFoodItem(@RequestParam Long id){
+    @PutMapping("/{id}")
+    public ResponseEntity<FoodItem> updateFoodItem(@PathVariable Long id, @Valid @RequestBody FoodItemDto foodItemDto) {
         FoodItem foodItem = foodItemRepo.findById(id).orElse(null);
-       if(foodItem != null) {
-           foodItemRepo.delete(foodItem);
-       }
-
-        return "redirect:/fooditems";
+        if (foodItem == null) {
+            return ResponseEntity.notFound().build();
+        }
+        foodItem.setName(foodItemDto.getName());
+        foodItem.setDescription(foodItemDto.getDescription());
+        foodItem.setExpiryDate(foodItemDto.getExpiryDate());
+        foodItem.setQuantity(foodItemDto.getQuantity());
+        foodItem.setStatus(foodItemDto.getStatus());
+        foodItem.setUpdatedDate(new Date());
+        foodItemRepo.save(foodItem);
+        return ResponseEntity.ok(foodItem);
     }
 
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> deleteFoodItem(@PathVariable Long id) {
+        FoodItem foodItem = foodItemRepo.findById(id).orElse(null);
+        if (foodItem == null) {
+            return ResponseEntity.notFound().build();
+        }
+        foodItemRepo.delete(foodItem);
+        return ResponseEntity.noContent().build();
+    }
 }
