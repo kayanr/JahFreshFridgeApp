@@ -3,6 +3,7 @@ package com.jahfresh.passionprojrest.controllers;
 import com.jahfresh.passionprojrest.models.FoodItem;
 import com.jahfresh.passionprojrest.models.FoodItemDto;
 import com.jahfresh.passionprojrest.repositories.FoodItemRepo;
+import com.jahfresh.passionprojrest.services.FoodItemService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Sort;
@@ -19,6 +20,9 @@ public class FoodItemController {
 
     @Autowired
     private FoodItemRepo foodItemRepo;
+
+    @Autowired
+    private FoodItemService foodItemService;
 
     @GetMapping
     public List<FoodItem> getFoodItems() {
@@ -70,6 +74,12 @@ public class FoodItemController {
             return ResponseEntity.notFound().build();
         }
         foodItemRepo.delete(foodItem);
+        return ResponseEntity.noContent().build();
+    }
+
+    @PostMapping("/refresh-statuses")
+    public ResponseEntity<Void> refreshStatuses() {
+        foodItemService.updateExpiryStatuses();
         return ResponseEntity.noContent().build();
     }
 }
