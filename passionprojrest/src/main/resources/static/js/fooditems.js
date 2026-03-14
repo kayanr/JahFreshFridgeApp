@@ -26,7 +26,8 @@ const STATUS_LABEL = {
 
 function formatDate(dateStr) {
     if (!dateStr) return '—';
-    return new Date(dateStr).toLocaleDateString('en-US', {
+    const date = dateStr.includes('T') ? new Date(dateStr) : new Date(dateStr + 'T00:00:00');
+    return date.toLocaleDateString('en-US', {
         year: 'numeric', month: 'short', day: 'numeric'
     });
 }
