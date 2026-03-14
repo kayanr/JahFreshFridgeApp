@@ -11,7 +11,7 @@ import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
-import javax.validation.Valid;
+import jakarta.validation.Valid;
 import java.util.Date;
 
 @Controller
@@ -38,8 +38,9 @@ public class FoodItemController {
     }
 
     @PostMapping("/create")
-        public String createFoodIem(@Valid FoodItemDto foodItemDto, BindingResult bindingResult) {
+        public String createFoodIem(Model model, @Valid FoodItemDto foodItemDto, BindingResult bindingResult) {
             if(bindingResult.hasErrors()) {
+                model.addAttribute("statuses", FoodStatus.values());
                 return "fooditems/create";
             }
 

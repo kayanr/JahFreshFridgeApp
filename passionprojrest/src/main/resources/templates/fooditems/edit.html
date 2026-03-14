@@ -39,10 +39,7 @@
                 <div class="row mb-3">
                     <label class="col-sm-4 col-form-label">Expiry Date</label>
                     <div class="col-sm-8">
-                        <input type="date"
-                               class="form-control"
-                               th:value="${foodItemDto.expiryDate != null ? foodItemDto.expiryDate.toString() : ''}"
-                                name="expiryDate">
+                        <input type="date" class="form-control" th:field="*{expiryDate}">
                         <p th:if="${#fields.hasErrors('expiryDate')}"
                            th:errorclass="text-danger"
                            th:errors="*{expiryDate}">
@@ -66,12 +63,14 @@
                 <div class="row mb-3">
                     <label class="col-sm-4 col-form-label">Food Status</label>
                     <div class="col-sm-8">
-                        <select id="status" name="status" required>
-                            <option value="" disabled selected>Select Status</option>
-                            <th:block th:each="status : ${statuses}">
-                                <option th:value="${status}" th:text="${status}" th:selected="${status == foodItemDto.status}"></option>
-                            </th:block>
-                        </select><br><br>
+                        <select class="form-control" th:field="*{status}">
+                            <option value="">Select Status</option>
+                            <option th:each="s : ${statuses}" th:value="${s}" th:text="${s}"></option>
+                        </select>
+                        <p th:if="${#fields.hasErrors('status')}"
+                           class="text-danger"
+                           th:errors="*{status}">
+                        </p>
                     </div>
                 </div>
                 <div class="row">
