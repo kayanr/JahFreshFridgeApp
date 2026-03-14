@@ -183,6 +183,15 @@ async function confirmDelete() {
 document.getElementById('btn-add-item').addEventListener('click', openAddModal);
 document.getElementById('btn-save-item').addEventListener('click', saveItem);
 document.getElementById('btn-confirm-delete').addEventListener('click', confirmDelete);
+document.getElementById('btn-refresh-statuses').addEventListener('click', async () => {
+    try {
+        await refreshStatuses();
+        showAlert('Statuses refreshed successfully.');
+        await loadFoodItems();
+    } catch (error) {
+        showAlert(error.message, 'danger');
+    }
+});
 
 // ── Init ───────────────────────────────────────────────────────────────────
 

@@ -38,3 +38,10 @@ async function deleteFoodItem(id) {
     });
     if (!response.ok) throw new Error('Failed to delete food item');
 }
+
+async function refreshStatuses() {
+    const response = await fetch(`${BASE_URL}/refresh-statuses`, {
+        method: 'POST'
+    });
+    if (!response.ok) throw new Error('Failed to refresh statuses');
+}
