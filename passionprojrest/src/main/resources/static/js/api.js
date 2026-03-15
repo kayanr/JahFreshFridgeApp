@@ -51,3 +51,9 @@ async function getStats() {
     if (!response.ok) throw new Error('Failed to load stats');
     return response.json();
 }
+
+async function getExpiringSoon() {
+    const response = await fetch(`${BASE_URL}/expiring-soon`);
+    if (!response.ok) throw new Error('Failed to load expiring soon items');
+    return response.json();
+}
