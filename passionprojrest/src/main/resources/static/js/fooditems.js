@@ -222,6 +222,25 @@ document.getElementById('btn-refresh-statuses').addEventListener('click', async 
     }
 });
 
+// ── Expiring soon banner ────────────────────────────────────────────────────
+
+async function loadExpiringSoonBanner() {
+    try {
+        const items = await getExpiringSoon();
+        const banner = document.getElementById('expiring-soon-banner');
+        const message = document.getElementById('expiring-soon-message');
+        if (items.length > 0) {
+            message.textContent = `${items.length} item${items.length > 1 ? 's are' : ' is'} expiring within 3 days.`;
+            banner.classList.remove('d-none');
+        } else {
+            banner.classList.add('d-none');
+        }
+    } catch (error) {
+        // Silently fail — banner is non-critical
+    }
+}
+
 // ── Init ───────────────────────────────────────────────────────────────────
 
 loadFoodItems();
+loadExpiringSoonBanner();
