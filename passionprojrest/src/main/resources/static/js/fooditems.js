@@ -8,6 +8,10 @@ let deleteTargetId = null;
 // In-memory store of all loaded items — used for filtering without extra API calls
 let allItems = [];
 
+// Sort state
+let sortColumn = null;
+let sortAsc = true;
+
 // Status badge colours and display labels
 const STATUS_BADGE = {
     FRESH:          'bg-success',
@@ -111,13 +115,35 @@ function applyFilters() {
     const search = document.getElementById('search-input').value.toLowerCase().trim();
     const status = document.getElementById('filter-status').value;
 
-    const filtered = allItems.filter(item => {
+    let filtered = allItems.filter(item => {
         const matchesSearch = !search || item.name.toLowerCase().includes(search);
         const matchesStatus = !status || item.status === status;
         return matchesSearch && matchesStatus;
     });
 
+    if (sortColumn) {
+        filtered = [...filtered].sort((a, b) => {
+            let valA = a[sortColumn] ?? '';
+            let valB = b[sortColumn] ?? '';
+            if (typeof valA === 'string') valA = valA.toLowerCase();
+            if (typeof valB === 'string') valB = valB.toLowerCase();
+            if (valA < valB) return sortAsc ? -1 : 1;
+            if (valA > valB) return sortAsc ? 1 : -1;
+            return 0;
+        });
+    }
+
     renderTable(filtered);
+    updateSortIndicators();
+}
+
+function updateSortIndicators() {
+    document.querySelectorAll('th[data-sort]').forEach(th => {
+        th.classList.remove('sort-asc', 'sort-desc');
+        if (th.dataset.sort === sortColumn) {
+            th.classList.add(sortAsc ? 'sort-asc' : 'sort-desc');
+        }
+    });
 }
 
 // ── Add modal ──────────────────────────────────────────────────────────────
@@ -200,6 +226,18 @@ async function confirmDelete() {
 }
 
 // ── Event listeners ────────────────────────────────────────────────────────
+
+document.querySelectorAll('th[data-sort]').forEach(th => {
+    th.addEventListener('click', () => {
+        if (sortColumn === th.dataset.sort) {
+            sortAsc = !sortAsc;
+        } else {
+            sortColumn = th.dataset.sort;
+            sortAsc = true;
+        }
+        applyFilters();
+    });
+});
 
 document.getElementById('search-input').addEventListener('input', applyFilters);
 document.getElementById('filter-status').addEventListener('change', applyFilters);

@@ -34,6 +34,13 @@ main {
     color: #ffffff;
 }
 
+.thead-slate th[data-sort]:hover {
+    background-color: #2c3e50;
+}
+
+.thead-slate th.sort-asc::after  { content: ' ▲'; font-size: 0.7rem; }
+.thead-slate th.sort-desc::after { content: ' ▼'; font-size: 0.7rem; }
+
 /* ── Hero (index page) ────────────────────────────────────────────────────── */
 
 .hero {
