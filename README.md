@@ -6,6 +6,7 @@ A Spring Boot REST API application with a Vanilla JS frontend that helps you tra
 
 - Track food items with name, description, quantity, and expiration dates
 - Auto-updates item statuses daily based on expiry date (Fresh, Expiring Soon, Expired)
+- Expiring soon alert banner on all pages — links directly to filtered view
 - Dashboard with live stats showing counts per status
 - Real-time search and filter by name and status
 - Mark items as Consumed or Discarded
@@ -62,14 +63,13 @@ A Spring Boot REST API application with a Vanilla JS frontend that helps you tra
 | POST | `/api/fooditems` | Create a food item |
 | PUT | `/api/fooditems/{id}` | Update a food item |
 | DELETE | `/api/fooditems/{id}` | Delete a food item |
+| GET | `/api/fooditems/expiring-soon` | Get items expiring within 3 days |
 | GET | `/api/fooditems/stats` | Get counts by status |
 | POST | `/api/fooditems/refresh-statuses` | Manually trigger expiry status update |
 
 ## Future Enhancements
 
 - [ ] User authentication and personal fridge per user
-- [ ] Email/SMS notifications for expiring items
-- [ ] Mobile app version
-- [ ] Barcode scanning for easy item entry
-- [ ] Recipe suggestions for expiring items
-- [ ] Grocery shopping list integration
+- [ ] Email notifications for expiring items
+- [ ] Grocery shopping list
+- [x] Recipe suggestions — click any item name to search Google recipes

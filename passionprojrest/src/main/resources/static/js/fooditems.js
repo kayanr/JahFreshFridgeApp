@@ -68,7 +68,7 @@ function renderTable(items) {
     tbody.innerHTML = items.map(item => `
         <tr>
             <td>${item.id}</td>
-            <td>${item.name}</td>
+            <td><a href="https://www.google.com/search?q=recipes+with+${encodeURIComponent(item.name)}" target="_blank" class="text-decoration-none">${item.name}</a></td>
             <td>${item.description || '—'}</td>
             <td>${formatDate(item.expiryDate)}</td>
             <td>${item.quantity}</td>
@@ -222,6 +222,31 @@ document.getElementById('btn-refresh-statuses').addEventListener('click', async 
     }
 });
 
+// ── Expiring soon banner ────────────────────────────────────────────────────
+
+async function loadExpiringSoonBanner() {
+    try {
+        const items = await getExpiringSoon();
+        const banner = document.getElementById('expiring-soon-banner');
+        const message = document.getElementById('expiring-soon-message');
+        if (items.length > 0) {
+            message.textContent = `${items.length} item${items.length > 1 ? 's are' : ' is'} expiring within 3 days.`;
+            banner.classList.remove('d-none');
+        } else {
+            banner.classList.add('d-none');
+        }
+    } catch (error) {
+        // Silently fail — banner is non-critical
+    }
+}
+
 // ── Init ───────────────────────────────────────────────────────────────────
 
+const params = new URLSearchParams(window.location.search);
+const filterParam = params.get('filter');
+if (filterParam) {
+    document.getElementById('filter-status').value = filterParam;
+}
+
 loadFoodItems();
+loadExpiringSoonBanner();

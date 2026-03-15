@@ -12,6 +12,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDate;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -84,6 +86,14 @@ public class FoodItemController {
     public ResponseEntity<Void> refreshStatuses() {
         foodItemService.updateExpiryStatuses();
         return ResponseEntity.noContent().build();
+    }
+
+    @GetMapping("/expiring-soon")
+    public List<FoodItem> getExpiringSoon() {
+        LocalDate today = LocalDate.now();
+        LocalDate cutoff = today.plusDays(3);
+        List<FoodStatus> excluded = Arrays.asList(FoodStatus.CONSUMED, FoodStatus.DISCARDED, FoodStatus.EXPIRED);
+        return foodItemRepo.findExpiringSoon(today, cutoff, excluded);
     }
 
     @GetMapping("/stats")
