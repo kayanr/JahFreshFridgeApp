@@ -7,6 +7,9 @@ import com.jahfresh.passionprojrest.repositories.FoodItemRepo;
 import com.jahfresh.passionprojrest.services.FoodItemService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -30,8 +33,11 @@ public class FoodItemController {
     private FoodItemService foodItemService;
 
     @GetMapping
-    public List<FoodItem> getFoodItems() {
-        return foodItemRepo.findAll(Sort.by(Sort.Direction.DESC, "id"));
+    public Page<FoodItem> getFoodItems(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "5") int size) {
+        Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "id"));
+        return foodItemRepo.findAll(pageable);
     }
 
     @GetMapping("/{id}")
