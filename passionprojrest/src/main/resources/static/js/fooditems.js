@@ -242,5 +242,11 @@ async function loadExpiringSoonBanner() {
 
 // ── Init ───────────────────────────────────────────────────────────────────
 
+const params = new URLSearchParams(window.location.search);
+const filterParam = params.get('filter');
+if (filterParam) {
+    document.getElementById('filter-status').value = filterParam;
+}
+
 loadFoodItems();
 loadExpiringSoonBanner();
