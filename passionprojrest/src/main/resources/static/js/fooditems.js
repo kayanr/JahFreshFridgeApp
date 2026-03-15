@@ -68,7 +68,7 @@ function renderTable(items) {
     tbody.innerHTML = items.map(item => `
         <tr>
             <td>${item.id}</td>
-            <td>${item.name}</td>
+            <td><a href="https://www.google.com/search?q=recipes+with+${encodeURIComponent(item.name)}" target="_blank" class="text-decoration-none">${item.name}</a></td>
             <td>${item.description || '—'}</td>
             <td>${formatDate(item.expiryDate)}</td>
             <td>${item.quantity}</td>
