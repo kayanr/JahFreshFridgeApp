@@ -57,3 +57,9 @@ async function getExpiringSoon() {
     if (!response.ok) throw new Error('Failed to load expiring soon items');
     return response.json();
 }
+
+async function getCategories() {
+    const response = await fetch(`${BASE_URL}/categories`);
+    if (!response.ok) throw new Error('Failed to load categories');
+    return response.json();
+}

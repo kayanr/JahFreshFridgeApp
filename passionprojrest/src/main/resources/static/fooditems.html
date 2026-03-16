@@ -42,10 +42,10 @@
 
     <!-- Search and filter controls -->
     <div class="row g-2 mb-3">
-        <div class="col-md-6">
+        <div class="col-md-4">
             <input type="text" class="form-control" id="search-input" placeholder="Search by name...">
         </div>
-        <div class="col-md-4">
+        <div class="col-md-3">
             <select class="form-select" id="filter-status">
                 <option value="">All Statuses</option>
                 <option value="FRESH">Fresh</option>
@@ -53,6 +53,11 @@
                 <option value="EXPIRED">Expired</option>
                 <option value="CONSUMED">Consumed</option>
                 <option value="DISCARDED">Discarded</option>
+            </select>
+        </div>
+        <div class="col-md-3">
+            <select class="form-select" id="filter-category">
+                <option value="">All Categories</option>
             </select>
         </div>
         <div class="col-md-2">
@@ -71,13 +76,14 @@
                     <th data-sort="expiryDate" style="cursor:pointer">Expiry Date</th>
                     <th data-sort="quantity" style="cursor:pointer">Quantity</th>
                     <th data-sort="status" style="cursor:pointer">Status</th>
+                    <th data-sort="category" style="cursor:pointer">Category</th>
                     <th>Created</th>
                     <th>Actions</th>
                 </tr>
             </thead>
             <tbody id="fooditems-table-body">
                 <tr>
-                    <td colspan="8" class="text-center text-muted py-4">Loading...</td>
+                    <td colspan="9" class="text-center text-muted py-4">Loading...</td>
                 </tr>
             </tbody>
         </table>
@@ -137,6 +143,14 @@
                             <option value="DISCARDED">Discarded by user</option>
                         </select>
                         <div class="invalid-feedback">Status is required.</div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="form-category" class="form-label">Category <span class="text-danger">*</span></label>
+                        <select class="form-select" id="form-category" required>
+                            <option value="">Select Category</option>
+                        </select>
+                        <div class="invalid-feedback">Category is required.</div>
                     </div>
                 </form>
             </div>
