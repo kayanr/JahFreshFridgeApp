@@ -28,6 +28,9 @@ public class FoodItemDto {
     @NotNull(message = "Status is required")
     private FoodStatus status;
 
+    @NotNull(message = "Category is required")
+    private FoodCategory category;
+
     public String getName() {
         return name;
     }
@@ -78,4 +81,8 @@ public class FoodItemDto {
     public FoodStatus getStatus() { return status; }
 
     public void setStatus(FoodStatus status) { this.status = status; }
+
+    public FoodCategory getCategory() { return category; }
+
+    public void setCategory(FoodCategory category) { this.category = category; }
 }

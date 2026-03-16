@@ -23,6 +23,9 @@ public class FoodItem {
     @Enumerated(EnumType.STRING)
     private FoodStatus status;
 
+    @Enumerated(EnumType.STRING)
+    private FoodCategory category;
+
     public Long getId() {
         return id;
     }
@@ -81,5 +84,13 @@ public class FoodItem {
 
     public void setStatus(FoodStatus status) {
         this.status = status;
+    }
+
+    public FoodCategory getCategory() {
+        return category;
+    }
+
+    public void setCategory(FoodCategory category) {
+        this.category = category;
     }
 }

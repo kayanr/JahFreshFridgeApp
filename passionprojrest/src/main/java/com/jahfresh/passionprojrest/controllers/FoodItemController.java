@@ -1,5 +1,6 @@
 package com.jahfresh.passionprojrest.controllers;
 
+import com.jahfresh.passionprojrest.models.FoodCategory;
 import com.jahfresh.passionprojrest.models.FoodItem;
 import com.jahfresh.passionprojrest.models.FoodItemDto;
 import com.jahfresh.passionprojrest.models.FoodStatus;
@@ -57,6 +58,7 @@ public class FoodItemController {
         foodItem.setExpiryDate(foodItemDto.getExpiryDate());
         foodItem.setQuantity(foodItemDto.getQuantity());
         foodItem.setStatus(foodItemDto.getStatus());
+        foodItem.setCategory(foodItemDto.getCategory());
         foodItem.setCreatedDate(new Date());
         foodItemRepo.save(foodItem);
         return ResponseEntity.status(HttpStatus.CREATED).body(foodItem);
@@ -73,6 +75,7 @@ public class FoodItemController {
         foodItem.setExpiryDate(foodItemDto.getExpiryDate());
         foodItem.setQuantity(foodItemDto.getQuantity());
         foodItem.setStatus(foodItemDto.getStatus());
+        foodItem.setCategory(foodItemDto.getCategory());
         foodItem.setUpdatedDate(new Date());
         foodItemRepo.save(foodItem);
         return ResponseEntity.ok(foodItem);
@@ -100,6 +103,11 @@ public class FoodItemController {
         LocalDate cutoff = today.plusDays(3);
         List<FoodStatus> excluded = Arrays.asList(FoodStatus.CONSUMED, FoodStatus.DISCARDED, FoodStatus.EXPIRED);
         return foodItemRepo.findExpiringSoon(today, cutoff, excluded);
+    }
+
+    @GetMapping("/categories")
+    public FoodCategory[] getCategories() {
+        return FoodCategory.values();
     }
 
     @GetMapping("/stats")
