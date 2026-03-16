@@ -33,6 +33,15 @@ const STATUS_LABEL = {
     DISCARDED:      'Discarded'
 };
 
+const CATEGORY_LABEL = {
+    DAIRY:      'Dairy',
+    PRODUCE:    'Produce',
+    MEAT:       'Meat',
+    LEFTOVERS:  'Leftovers',
+    DRINKS:     'Drinks',
+    OTHER:      'Other'
+};
+
 // ── Helpers ────────────────────────────────────────────────────────────────
 
 function formatDate(dateStr) {
@@ -63,10 +72,11 @@ function renderTable(items) {
 
     if (items.length === 0) {
         const isFiltering = document.getElementById('search-input').value ||
-                            document.getElementById('filter-status').value;
+                            document.getElementById('filter-status').value ||
+                            document.getElementById('filter-category').value;
         tbody.innerHTML = `
             <tr>
-                <td colspan="8" class="text-center text-muted py-4">
+                <td colspan="9" class="text-center text-muted py-4">
                     ${isFiltering ? 'No items match your search.' : 'No food items yet. Add one!'}
                 </td>
             </tr>`;
@@ -85,6 +95,7 @@ function renderTable(items) {
                     ${STATUS_LABEL[item.status] || item.status}
                 </span>
             </td>
+            <td>${CATEGORY_LABEL[item.category] || item.category || '—'}</td>
             <td>${formatDate(item.createdDate)}</td>
             <td>
                 <button class="btn btn-sm btn-outline-primary me-1"
@@ -129,11 +140,13 @@ function updatePaginationControls(data) {
 function applyFilters() {
     const search = document.getElementById('search-input').value.toLowerCase().trim();
     const status = document.getElementById('filter-status').value;
+    const category = document.getElementById('filter-category').value;
 
     let filtered = allItems.filter(item => {
         const matchesSearch = !search || item.name.toLowerCase().includes(search);
         const matchesStatus = !status || item.status === status;
-        return matchesSearch && matchesStatus;
+        const matchesCategory = !category || item.category === category;
+        return matchesSearch && matchesStatus && matchesCategory;
     });
 
     if (sortColumn) {
@@ -183,6 +196,7 @@ async function openEditModal(id) {
         document.getElementById('form-expiry-date').value  = item.expiryDate;
         document.getElementById('form-quantity').value     = item.quantity;
         document.getElementById('form-status').value       = item.status;
+        document.getElementById('form-category').value     = item.category || '';
         document.getElementById('fooditem-form').classList.remove('was-validated');
         foodItemModal.show();
     } catch (error) {
@@ -203,7 +217,8 @@ async function saveItem() {
         description: document.getElementById('form-description').value.trim(),
         expiryDate:  document.getElementById('form-expiry-date').value,
         quantity:    parseInt(document.getElementById('form-quantity').value, 10),
-        status:      document.getElementById('form-status').value
+        status:      document.getElementById('form-status').value,
+        category:    document.getElementById('form-category').value
     };
 
     try {
@@ -259,9 +274,11 @@ document.getElementById('btn-next-page').addEventListener('click', () => loadFoo
 
 document.getElementById('search-input').addEventListener('input', applyFilters);
 document.getElementById('filter-status').addEventListener('change', applyFilters);
+document.getElementById('filter-category').addEventListener('change', applyFilters);
 document.getElementById('btn-clear-filters').addEventListener('click', () => {
     document.getElementById('search-input').value = '';
     document.getElementById('filter-status').value = '';
+    document.getElementById('filter-category').value = '';
     applyFilters();
 });
 
@@ -298,11 +315,27 @@ async function loadExpiringSoonBanner() {
 
 // ── Init ───────────────────────────────────────────────────────────────────
 
+async function loadCategories() {
+    try {
+        const categories = await getCategories();
+        const formSelect = document.getElementById('form-category');
+        const filterSelect = document.getElementById('filter-category');
+        categories.forEach(cat => {
+            const label = CATEGORY_LABEL[cat] || cat;
+            formSelect.innerHTML += `<option value="${cat}">${label}</option>`;
+            filterSelect.innerHTML += `<option value="${cat}">${label}</option>`;
+        });
+    } catch (error) {
+        // Silently fail — categories will just be empty
+    }
+}
+
 const params = new URLSearchParams(window.location.search);
 const filterParam = params.get('filter');
 if (filterParam) {
     document.getElementById('filter-status').value = filterParam;
 }
 
+loadCategories();
 loadFoodItems();
 loadExpiringSoonBanner();
