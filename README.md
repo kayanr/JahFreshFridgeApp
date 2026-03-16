@@ -9,6 +9,9 @@ A Spring Boot REST API application with a Vanilla JS frontend that helps you tra
 - Expiring soon alert banner on all pages — links directly to filtered view
 - Dashboard with live stats showing counts per status
 - Real-time search and filter by name and status
+- Sort table columns by name, expiry date, quantity or status
+- Paginated food items table (5 items per page)
+- Recipe suggestions — click any item name to search Google recipes
 - Mark items as Consumed or Discarded
 - Responsive web interface
 
@@ -18,9 +21,19 @@ A Spring Boot REST API application with a Vanilla JS frontend that helps you tra
 - **API:** RESTful JSON API
 - **Database:** MySQL
 - **ORM:** Spring Data JPA / Hibernate
+- **Validation:** Jakarta Validation (spring-boot-starter-validation)
+- **Scheduling:** Spring Task Scheduling
 - **Frontend:** Vanilla JavaScript, HTML5, CSS3
 - **Styling:** Bootstrap 5
 - **Build Tool:** Maven
+
+## Pages
+
+| Page | URL | Description |
+|---|---|---|
+| Home | `/` | Landing page |
+| My Fridge | `/fooditems.html` | CRUD, search, filter, sort, pagination |
+| Dashboard | `/dashboard.html` | Live stats cards per status |
 
 ## Getting Started
 
@@ -33,7 +46,7 @@ A Spring Boot REST API application with a Vanilla JS frontend that helps you tra
 
 1. Clone the repository
    ```bash
-   git clone https://github.com/your-username/JahFreshFridgeApp.git
+   git clone https://github.com/kayanr/JahFreshFridgeApp.git
    ```
 
 2. Create the database
@@ -58,7 +71,7 @@ A Spring Boot REST API application with a Vanilla JS frontend that helps you tra
 
 | Method | Endpoint | Description |
 |--------|----------|-------------|
-| GET | `/api/fooditems` | Get all food items |
+| GET | `/api/fooditems?page=0&size=5` | Get all food items (paginated) |
 | GET | `/api/fooditems/{id}` | Get a food item by ID |
 | POST | `/api/fooditems` | Create a food item |
 | PUT | `/api/fooditems/{id}` | Update a food item |
@@ -72,4 +85,3 @@ A Spring Boot REST API application with a Vanilla JS frontend that helps you tra
 - [ ] User authentication and personal fridge per user
 - [ ] Email notifications for expiring items
 - [ ] Grocery shopping list
-- [x] Recipe suggestions — click any item name to search Google recipes

@@ -12,6 +12,10 @@ let allItems = [];
 let sortColumn = null;
 let sortAsc = true;
 
+// Pagination state
+let currentPage = 0;
+let totalPages = 0;
+
 // Status badge colours and display labels
 const STATUS_BADGE = {
     FRESH:          'bg-success',
@@ -94,11 +98,15 @@ function renderTable(items) {
 
 // ── Data loading ───────────────────────────────────────────────────────────
 
-async function loadFoodItems() {
+async function loadFoodItems(page = 0) {
     const tbody = document.getElementById('fooditems-table-body');
     try {
-        allItems = await getAllFoodItems();
+        const data = await getAllFoodItems(page);
+        allItems = data.content;
+        currentPage = data.number;
+        totalPages = data.totalPages;
         applyFilters();
+        updatePaginationControls(data);
     } catch (error) {
         tbody.innerHTML = `
             <tr>
@@ -107,6 +115,13 @@ async function loadFoodItems() {
                 </td>
             </tr>`;
     }
+}
+
+function updatePaginationControls(data) {
+    document.getElementById('pagination-info').textContent =
+        `Page ${data.number + 1} of ${data.totalPages} (${data.totalElements} items)`;
+    document.getElementById('btn-prev-page').disabled = data.first;
+    document.getElementById('btn-next-page').disabled = data.last;
 }
 
 // ── Search & Filter ─────────────────────────────────────────────────────────
@@ -200,7 +215,7 @@ async function saveItem() {
             showAlert('Item added successfully.');
         }
         foodItemModal.hide();
-        await loadFoodItems();
+        await loadFoodItems(currentPage);
     } catch (error) {
         showAlert(error.message, 'danger');
     }
@@ -219,7 +234,7 @@ async function confirmDelete() {
         await deleteFoodItem(deleteTargetId);
         deleteModal.hide();
         showAlert('Item deleted.');
-        await loadFoodItems();
+        await loadFoodItems(currentPage);
     } catch (error) {
         showAlert(error.message, 'danger');
     }
@@ -239,6 +254,9 @@ document.querySelectorAll('th[data-sort]').forEach(th => {
     });
 });
 
+document.getElementById('btn-prev-page').addEventListener('click', () => loadFoodItems(currentPage - 1));
+document.getElementById('btn-next-page').addEventListener('click', () => loadFoodItems(currentPage + 1));
+
 document.getElementById('search-input').addEventListener('input', applyFilters);
 document.getElementById('filter-status').addEventListener('change', applyFilters);
 document.getElementById('btn-clear-filters').addEventListener('click', () => {
@@ -254,7 +272,7 @@ document.getElementById('btn-refresh-statuses').addEventListener('click', async 
     try {
         await refreshStatuses();
         showAlert('Statuses refreshed successfully.');
-        await loadFoodItems();
+        await loadFoodItems(currentPage);
     } catch (error) {
         showAlert(error.message, 'danger');
     }

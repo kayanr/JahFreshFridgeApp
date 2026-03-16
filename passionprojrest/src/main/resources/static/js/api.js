@@ -1,7 +1,7 @@
 const BASE_URL = '/api/fooditems';
 
-async function getAllFoodItems() {
-    const response = await fetch(BASE_URL);
+async function getAllFoodItems(page = 0, size = 5) {
+    const response = await fetch(`${BASE_URL}?page=${page}&size=${size}`);
     if (!response.ok) throw new Error('Failed to load food items');
     return response.json();
 }
