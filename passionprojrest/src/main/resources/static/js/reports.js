@@ -12,8 +12,8 @@ async function loadReport() {
     btn.innerHTML = `<span class="spinner-border spinner-border-sm me-1" role="status"></span>Loading...`;
 
     try {
-        const [report, waste, categories] = await Promise.all([
-            getExpirationSummary(), getWasteSummary(), getCategorySummary()
+        const [report, waste, categories, monthly] = await Promise.all([
+            getExpirationSummary(), getWasteSummary(), getCategorySummary(), getMonthlyActivity()
         ]);
         renderSummaryCards(report);
         renderStatusChart(report);
@@ -22,6 +22,7 @@ async function loadReport() {
         renderWasteCards(waste);
         renderWasteChart(waste);
         renderCategoryTable(categories);
+        renderMonthlyActivity(monthly);
     } catch (error) {
         showAlert('Failed to load report. Please try again.', 'danger');
     } finally {
@@ -168,6 +169,15 @@ function renderCategoryTable(categories) {
             </td>
         </tr>`;
     }).join('');
+}
+
+function renderMonthlyActivity(monthly) {
+    const monthNames = ['January', 'February', 'March', 'April', 'May', 'June',
+                        'July', 'August', 'September', 'October', 'November', 'December'];
+    document.getElementById('monthly-period').textContent = `${monthNames[monthly.month - 1]} ${monthly.year}`;
+    document.getElementById('monthly-added').textContent = monthly.itemsAdded;
+    document.getElementById('monthly-consumed').textContent = monthly.itemsConsumed;
+    document.getElementById('monthly-expired').textContent = monthly.itemsExpired;
 }
 
 function formatCategory(category) {
