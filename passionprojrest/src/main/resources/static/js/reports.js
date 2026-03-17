@@ -2,10 +2,12 @@ let statusChart = null;
 let wasteChart = null;
 let lastUpdatedTime = null;
 let lastUpdatedInterval = null;
+let lastFetchedItems = [];
 
 document.addEventListener('DOMContentLoaded', () => {
     loadReport();
     document.getElementById('btn-refresh-report').addEventListener('click', loadReport);
+    document.getElementById('btn-export-csv').addEventListener('click', exportToCSV);
 });
 
 async function loadReport() {
@@ -73,8 +75,10 @@ function renderSummaryCards(report) {
 
 function renderTopExpiringTable(items) {
     const tbody = document.getElementById('report-table-body');
+    lastFetchedItems = items || [];
+    document.getElementById('btn-export-csv').disabled = lastFetchedItems.length === 0;
 
-    if (!items || items.length === 0) {
+    if (lastFetchedItems.length === 0) {
         tbody.innerHTML = `<tr><td colspan="6" class="text-center text-muted py-4">No active items found.</td></tr>`;
         return;
     }
@@ -296,6 +300,35 @@ function formatStatusBadge(status) {
     };
     const cls = badges[status] || 'bg-secondary';
     return `<span class="badge ${cls}">${status.replace('_', ' ')}</span>`;
+}
+
+function exportToCSV() {
+    const headers = ['Name', 'Category', 'Expiry Date', 'Days Left', 'Quantity', 'Status'];
+    const rows = lastFetchedItems.map(item => {
+        const today = new Date();
+        today.setHours(0, 0, 0, 0);
+        const expiry = new Date(item.expiryDate + 'T00:00:00');
+        const days = Math.round((expiry - today) / (1000 * 60 * 60 * 24));
+        const daysLabel = days === 0 ? 'Today' : days > 0 ? `${days} day(s)` : `${Math.abs(days)} day(s) ago`;
+
+        return [
+            `"${item.name}"`,
+            formatCategory(item.category),
+            formatDate(item.expiryDate),
+            daysLabel,
+            item.quantity,
+            item.status.replace('_', ' ')
+        ].join(',');
+    });
+
+    const csv = [headers.join(','), ...rows].join('\n');
+    const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `jahfresh-items-requiring-attention-${new Date().toISOString().slice(0, 10)}.csv`;
+    a.click();
+    URL.revokeObjectURL(url);
 }
 
 function showAlert(message, type) {
