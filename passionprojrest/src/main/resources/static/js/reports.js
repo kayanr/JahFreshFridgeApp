@@ -51,10 +51,12 @@ function updateLastUpdatedDisplay() {
 function checkExpiredWarning(report) {
     const container = document.getElementById('alert-container');
     if (report.totalActive > 0 && (report.expiredCount / report.totalActive) > 0.3) {
+        const wasteRate = Math.round((report.expiredCount / report.totalActive) * 1000) / 10;
         container.innerHTML = `
             <div class="alert alert-warning alert-dismissible fade show" role="alert">
                 ⚠️ <strong>${report.expiredCount} of your ${report.totalActive} active items are expired.</strong>
-                Consider reviewing your fridge and discarding or consuming them.
+                Consider reviewing your fridge and discarding or consuming them.<br>
+                <small>Your waste exposure rate is <strong>${wasteRate}%</strong> this period.</small>
                 <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
             </div>`;
     } else {
@@ -97,6 +99,25 @@ function renderStatusChart(report) {
 
     if (statusChart) {
         statusChart.destroy();
+        statusChart = null;
+    }
+
+    if (report.totalActive === 0) {
+        statusChart = new Chart(ctx, {
+            type: 'doughnut',
+            data: {
+                labels: ['No active items'],
+                datasets: [{ data: [1], backgroundColor: ['#e9ecef'], borderWidth: 0 }]
+            },
+            options: {
+                responsive: true,
+                plugins: {
+                    legend: { position: 'bottom' },
+                    tooltip: { callbacks: { label: () => 'Add items to see breakdown' } }
+                }
+            }
+        });
+        return;
     }
 
     statusChart = new Chart(ctx, {
@@ -149,6 +170,25 @@ function renderWasteChart(waste) {
 
     if (wasteChart) {
         wasteChart.destroy();
+        wasteChart = null;
+    }
+
+    if (waste.totalProcessed === 0) {
+        wasteChart = new Chart(ctx, {
+            type: 'doughnut',
+            data: {
+                labels: ['No processed items'],
+                datasets: [{ data: [1], backgroundColor: ['#e9ecef'], borderWidth: 0 }]
+            },
+            options: {
+                responsive: true,
+                plugins: {
+                    legend: { position: 'bottom' },
+                    tooltip: { callbacks: { label: () => 'Mark items consumed or discarded to see breakdown' } }
+                }
+            }
+        });
+        return;
     }
 
     wasteChart = new Chart(ctx, {
