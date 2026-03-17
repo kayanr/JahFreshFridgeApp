@@ -14,7 +14,7 @@ public class FoodItem {
     private Long id;
 
     private String name;
-    private String description;
+    private String notes;
     private LocalDate expiryDate;
     private Date createdDate;
     private Date updatedDate;
@@ -42,12 +42,12 @@ public class FoodItem {
         this.name = name;
     }
 
-    public String getDescription() {
-        return description;
+    public String getNotes() {
+        return notes;
     }
 
-    public void setDescription(String description) {
-        this.description = description;
+    public void setNotes(String notes) {
+        this.notes = notes;
     }
 
     public LocalDate getExpiryDate() {
