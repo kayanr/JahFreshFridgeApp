@@ -70,3 +70,9 @@ async function getExpirationSummary() {
     if (!response.ok) throw new Error('Failed to load expiration summary');
     return response.json();
 }
+
+async function getWasteSummary() {
+    const response = await fetch(`${REPORTS_URL}/waste-summary`);
+    if (!response.ok) throw new Error('Failed to load waste summary');
+    return response.json();
+}

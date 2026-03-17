@@ -1,4 +1,5 @@
 let statusChart = null;
+let wasteChart = null;
 
 document.addEventListener('DOMContentLoaded', () => {
     loadReport();
@@ -11,11 +12,13 @@ async function loadReport() {
     btn.innerHTML = `<span class="spinner-border spinner-border-sm me-1" role="status"></span>Loading...`;
 
     try {
-        const report = await getExpirationSummary();
+        const [report, waste] = await Promise.all([getExpirationSummary(), getWasteSummary()]);
         renderSummaryCards(report);
         renderStatusChart(report);
         renderTopExpiringTable(report.topExpiringItems);
         checkExpiredWarning(report);
+        renderWasteCards(waste);
+        renderWasteChart(waste);
     } catch (error) {
         showAlert('Failed to load report. Please try again.', 'danger');
     } finally {
@@ -92,6 +95,41 @@ function renderStatusChart(report) {
                 legend: {
                     position: 'bottom'
                 }
+            }
+        }
+    });
+}
+
+function renderWasteCards(waste) {
+    document.getElementById('waste-consumed').textContent = waste.consumedCount;
+    document.getElementById('waste-discarded').textContent = waste.discardedCount;
+    document.getElementById('waste-rate').textContent = waste.totalProcessed > 0 ? `${waste.wasteRate}%` : '—';
+    const categoryEl = document.getElementById('waste-most-category');
+    categoryEl.textContent = waste.mostWastedCategory ? formatCategory(waste.mostWastedCategory) : '—';
+}
+
+function renderWasteChart(waste) {
+    const ctx = document.getElementById('waste-chart').getContext('2d');
+
+    if (wasteChart) {
+        wasteChart.destroy();
+    }
+
+    wasteChart = new Chart(ctx, {
+        type: 'doughnut',
+        data: {
+            labels: ['Consumed', 'Discarded'],
+            datasets: [{
+                data: [waste.consumedCount, waste.discardedCount],
+                backgroundColor: ['#198754', '#dc3545'],
+                borderWidth: 2,
+                borderColor: '#fff'
+            }]
+        },
+        options: {
+            responsive: true,
+            plugins: {
+                legend: { position: 'bottom' }
             }
         }
     });

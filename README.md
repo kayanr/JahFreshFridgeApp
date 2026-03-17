@@ -4,15 +4,18 @@ A Spring Boot REST API application with a Vanilla JS frontend that helps you tra
 
 ## Features
 
-- Track food items with name, description, quantity, and expiration dates
+- Track food items with name, notes, category, quantity, and expiration dates
+- Categorise items as Dairy, Produce, Meat, Leftovers, Drinks, or Other
 - Auto-updates item statuses daily based on expiry date (Fresh, Expiring Soon, Expired)
 - Expiring soon alert banner on all pages — links directly to filtered view
 - Dashboard with live stats showing counts per status
-- Real-time search and filter by name and status
+- Real-time search and filter by name, status, and category
 - Sort table columns by name, expiry date, quantity or status
 - Paginated food items table (5 items per page)
 - Recipe suggestions — click any item name to search Google recipes
 - Mark items as Consumed or Discarded
+- **Expiration Status Report** — summary cards, Items Requiring Attention table with Days Left column, and a Chart.js status breakdown chart
+- **Waste & Savings Report** — consumed vs discarded counts, waste rate %, most wasted category, and a Chart.js doughnut chart
 - Responsive web interface
 
 ## Tech Stack
@@ -34,6 +37,7 @@ A Spring Boot REST API application with a Vanilla JS frontend that helps you tra
 | Home | `/` | Landing page |
 | My Fridge | `/fooditems.html` | CRUD, search, filter, sort, pagination |
 | Dashboard | `/dashboard.html` | Live stats cards per status |
+| Reports | `/reports.html` | Expiration report and waste summary with charts |
 
 ## Getting Started
 
@@ -78,7 +82,10 @@ A Spring Boot REST API application with a Vanilla JS frontend that helps you tra
 | DELETE | `/api/fooditems/{id}` | Delete a food item |
 | GET | `/api/fooditems/expiring-soon` | Get items expiring within 3 days |
 | GET | `/api/fooditems/stats` | Get counts by status |
+| GET | `/api/fooditems/categories` | Get all available categories |
 | POST | `/api/fooditems/refresh-statuses` | Manually trigger expiry status update |
+| GET | `/api/reports/expiration-summary` | Get expiration report with items requiring attention |
+| GET | `/api/reports/waste-summary` | Get waste and savings report |
 
 ## Future Enhancements
 
