@@ -35,6 +35,18 @@ public interface FoodItemRepo extends JpaRepository<FoodItem, Long> {
             nativeQuery = true)
     Optional<String> findMostWastedCategory();
 
+    @Query(value = "SELECT COUNT(*) FROM food_items WHERE MONTH(created_date) = :month AND YEAR(created_date) = :year",
+            nativeQuery = true)
+    long countItemsAddedInMonth(@Param("month") int month, @Param("year") int year);
+
+    @Query(value = "SELECT COUNT(*) FROM food_items WHERE status = 'CONSUMED' AND MONTH(updated_date) = :month AND YEAR(updated_date) = :year",
+            nativeQuery = true)
+    long countItemsConsumedInMonth(@Param("month") int month, @Param("year") int year);
+
+    @Query(value = "SELECT COUNT(*) FROM food_items WHERE status = 'EXPIRED' AND MONTH(expiry_date) = :month AND YEAR(expiry_date) = :year",
+            nativeQuery = true)
+    long countItemsExpiredInMonth(@Param("month") int month, @Param("year") int year);
+
     @Query("SELECT new com.jahfresh.passionprojrest.models.CategorySummaryItem(f.category, COUNT(f), " +
             "SUM(CASE WHEN f.status = com.jahfresh.passionprojrest.models.FoodStatus.FRESH THEN 1L ELSE 0L END), " +
             "SUM(CASE WHEN f.status = com.jahfresh.passionprojrest.models.FoodStatus.EXPIRING_SOON THEN 1L ELSE 0L END), " +

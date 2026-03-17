@@ -4,6 +4,7 @@ import com.jahfresh.passionprojrest.models.CategorySummaryItem;
 import com.jahfresh.passionprojrest.models.ExpirationSummaryReport;
 import com.jahfresh.passionprojrest.models.FoodItem;
 import com.jahfresh.passionprojrest.models.FoodStatus;
+import com.jahfresh.passionprojrest.models.MonthlyActivityReport;
 import com.jahfresh.passionprojrest.models.WasteSummaryReport;
 import com.jahfresh.passionprojrest.repositories.FoodItemRepo;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -11,6 +12,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.time.LocalDate;
 import java.util.List;
 
 @RestController
@@ -45,5 +47,18 @@ public class ReportController {
     public List<CategorySummaryItem> getCategorySummary() {
         List<FoodStatus> excluded = List.of(FoodStatus.CONSUMED, FoodStatus.DISCARDED);
         return foodItemRepo.findCategorySummary(excluded);
+    }
+
+    @GetMapping("/monthly-activity")
+    public MonthlyActivityReport getMonthlyActivity() {
+        LocalDate now = LocalDate.now();
+        int month = now.getMonthValue();
+        int year = now.getYear();
+
+        long itemsAdded = foodItemRepo.countItemsAddedInMonth(month, year);
+        long itemsConsumed = foodItemRepo.countItemsConsumedInMonth(month, year);
+        long itemsExpired = foodItemRepo.countItemsExpiredInMonth(month, year);
+
+        return new MonthlyActivityReport(itemsAdded, itemsConsumed, itemsExpired, month, year);
     }
 }
