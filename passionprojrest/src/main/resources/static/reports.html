@@ -159,6 +159,35 @@
         </div>
     </div>
 
+    <!-- Category Breakdown Report -->
+    <hr class="my-4">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <h4 class="mb-0">Category Breakdown</h4>
+    </div>
+
+    <div class="card shadow-sm mb-4">
+        <div class="card-header bg-slate text-white fw-semibold">Inventory by Category</div>
+        <div class="card-body p-0">
+            <table class="table table-hover mb-0">
+                <thead class="thead-slate">
+                    <tr>
+                        <th>Category</th>
+                        <th>Total</th>
+                        <th>Fresh</th>
+                        <th>Expiring Soon</th>
+                        <th>Expired</th>
+                        <th style="min-width: 160px;">Breakdown</th>
+                    </tr>
+                </thead>
+                <tbody id="category-table-body">
+                    <tr>
+                        <td colspan="6" class="text-center text-muted py-4">Loading...</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
     <!-- Items Requiring Attention table -->
     <div class="card shadow-sm">
         <div class="card-header bg-slate text-white fw-semibold">

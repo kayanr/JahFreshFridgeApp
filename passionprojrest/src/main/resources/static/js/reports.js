@@ -12,13 +12,16 @@ async function loadReport() {
     btn.innerHTML = `<span class="spinner-border spinner-border-sm me-1" role="status"></span>Loading...`;
 
     try {
-        const [report, waste] = await Promise.all([getExpirationSummary(), getWasteSummary()]);
+        const [report, waste, categories] = await Promise.all([
+            getExpirationSummary(), getWasteSummary(), getCategorySummary()
+        ]);
         renderSummaryCards(report);
         renderStatusChart(report);
         renderTopExpiringTable(report.topExpiringItems);
         checkExpiredWarning(report);
         renderWasteCards(waste);
         renderWasteChart(waste);
+        renderCategoryTable(categories);
     } catch (error) {
         showAlert('Failed to load report. Please try again.', 'danger');
     } finally {
@@ -133,6 +136,38 @@ function renderWasteChart(waste) {
             }
         }
     });
+}
+
+function renderCategoryTable(categories) {
+    const tbody = document.getElementById('category-table-body');
+
+    if (!categories || categories.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="6" class="text-center text-muted py-4">No categorised items found.</td></tr>`;
+        return;
+    }
+
+    tbody.innerHTML = categories.map(cat => {
+        const total = cat.total || 1;
+        const freshPct = Math.round((cat.freshCount / total) * 100);
+        const expiringSoonPct = Math.round((cat.expiringSoonCount / total) * 100);
+        const expiredPct = Math.round((cat.expiredCount / total) * 100);
+
+        return `
+        <tr>
+            <td class="fw-semibold">${formatCategory(cat.category)}</td>
+            <td>${cat.total}</td>
+            <td><span class="badge bg-success">${cat.freshCount}</span></td>
+            <td><span class="badge bg-warning text-dark">${cat.expiringSoonCount}</span></td>
+            <td><span class="badge bg-danger">${cat.expiredCount}</span></td>
+            <td>
+                <div class="progress" style="height: 16px;">
+                    <div class="progress-bar bg-success" style="width: ${freshPct}%" title="Fresh"></div>
+                    <div class="progress-bar bg-warning" style="width: ${expiringSoonPct}%" title="Expiring Soon"></div>
+                    <div class="progress-bar bg-danger" style="width: ${expiredPct}%" title="Expired"></div>
+                </div>
+            </td>
+        </tr>`;
+    }).join('');
 }
 
 function formatCategory(category) {
