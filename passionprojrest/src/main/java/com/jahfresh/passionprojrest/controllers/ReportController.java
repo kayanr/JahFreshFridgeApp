@@ -39,8 +39,28 @@ public class ReportController {
         long consumedCount = foodItemRepo.countByStatus(FoodStatus.CONSUMED);
         long discardedCount = foodItemRepo.countByStatus(FoodStatus.DISCARDED);
         String mostWastedCategory = foodItemRepo.findMostWastedCategory().orElse(null);
+        long mostWastedCategoryCount = mostWastedCategory != null
+                ? foodItemRepo.countDiscardedByCategory(mostWastedCategory)
+                : 0;
 
-        return new WasteSummaryReport(consumedCount, discardedCount, mostWastedCategory);
+        LocalDate now = LocalDate.now();
+        LocalDate lastMonth = now.minusMonths(1);
+        long lastMonthConsumed = foodItemRepo.countItemsConsumedInMonth(lastMonth.getMonthValue(), lastMonth.getYear());
+        long lastMonthDiscarded = foodItemRepo.countDiscardedInMonth(lastMonth.getMonthValue(), lastMonth.getYear());
+        long lastMonthTotal = lastMonthConsumed + lastMonthDiscarded;
+
+        long thisMonthConsumed = foodItemRepo.countItemsConsumedInMonth(now.getMonthValue(), now.getYear());
+        long thisMonthDiscarded = foodItemRepo.countDiscardedInMonth(now.getMonthValue(), now.getYear());
+        long thisMonthTotal = thisMonthConsumed + thisMonthDiscarded;
+
+        Double wasteRateTrend = null;
+        if (lastMonthTotal > 0 && thisMonthTotal > 0) {
+            double lastRate = Math.round((lastMonthDiscarded * 100.0 / lastMonthTotal) * 10) / 10.0;
+            double thisRate = Math.round((thisMonthDiscarded * 100.0 / thisMonthTotal) * 10) / 10.0;
+            wasteRateTrend = Math.round((thisRate - lastRate) * 10) / 10.0;
+        }
+
+        return new WasteSummaryReport(consumedCount, discardedCount, mostWastedCategory, mostWastedCategoryCount, wasteRateTrend);
     }
 
     @GetMapping("/category-summary")

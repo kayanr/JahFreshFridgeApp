@@ -26,7 +26,8 @@ public interface FoodItemRepo extends JpaRepository<FoodItem, Long> {
     );
 
     @Query(value = "SELECT * FROM food_items WHERE status NOT IN ('CONSUMED', 'DISCARDED') " +
-            "ORDER BY CASE status WHEN 'EXPIRED' THEN 0 WHEN 'EXPIRING_SOON' THEN 1 ELSE 2 END, expiry_date ASC LIMIT 5",
+            "ORDER BY CASE status WHEN 'EXPIRED' THEN 0 WHEN 'EXPIRING_SOON' THEN 1 ELSE 2 END, " +
+            "ABS(DATEDIFF(expiry_date, CURRENT_DATE)) ASC LIMIT 5",
             nativeQuery = true)
     List<FoodItem> findItemsRequiringAttention();
 
@@ -34,6 +35,14 @@ public interface FoodItemRepo extends JpaRepository<FoodItem, Long> {
             "GROUP BY category ORDER BY COUNT(*) DESC LIMIT 1",
             nativeQuery = true)
     Optional<String> findMostWastedCategory();
+
+    @Query(value = "SELECT COUNT(*) FROM food_items WHERE status = 'DISCARDED' AND category = :category",
+            nativeQuery = true)
+    long countDiscardedByCategory(@Param("category") String category);
+
+    @Query(value = "SELECT COUNT(*) FROM food_items WHERE status = 'DISCARDED' AND MONTH(updated_date) = :month AND YEAR(updated_date) = :year",
+            nativeQuery = true)
+    long countDiscardedInMonth(@Param("month") int month, @Param("year") int year);
 
     @Query(value = "SELECT COUNT(*) FROM food_items WHERE MONTH(created_date) = :month AND YEAR(created_date) = :year",
             nativeQuery = true)
