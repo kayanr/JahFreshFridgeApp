@@ -82,3 +82,9 @@ async function getCategorySummary() {
     if (!response.ok) throw new Error('Failed to load category summary');
     return response.json();
 }
+
+async function getMonthlyActivity() {
+    const response = await fetch(`${REPORTS_URL}/monthly-activity`);
+    if (!response.ok) throw new Error('Failed to load monthly activity');
+    return response.json();
+}
