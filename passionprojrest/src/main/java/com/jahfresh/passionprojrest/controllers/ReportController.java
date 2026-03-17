@@ -3,6 +3,7 @@ package com.jahfresh.passionprojrest.controllers;
 import com.jahfresh.passionprojrest.models.ExpirationSummaryReport;
 import com.jahfresh.passionprojrest.models.FoodItem;
 import com.jahfresh.passionprojrest.models.FoodStatus;
+import com.jahfresh.passionprojrest.models.WasteSummaryReport;
 import com.jahfresh.passionprojrest.repositories.FoodItemRepo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -28,5 +29,14 @@ public class ReportController {
         List<FoodItem> itemsRequiringAttention = foodItemRepo.findItemsRequiringAttention();
 
         return new ExpirationSummaryReport(totalActive, freshCount, expiringSoonCount, expiredCount, itemsRequiringAttention);
+    }
+
+    @GetMapping("/waste-summary")
+    public WasteSummaryReport getWasteSummary() {
+        long consumedCount = foodItemRepo.countByStatus(FoodStatus.CONSUMED);
+        long discardedCount = foodItemRepo.countByStatus(FoodStatus.DISCARDED);
+        String mostWastedCategory = foodItemRepo.findMostWastedCategory().orElse(null);
+
+        return new WasteSummaryReport(consumedCount, discardedCount, mostWastedCategory);
     }
 }
