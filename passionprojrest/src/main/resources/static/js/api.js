@@ -76,3 +76,9 @@ async function getWasteSummary() {
     if (!response.ok) throw new Error('Failed to load waste summary');
     return response.json();
 }
+
+async function getCategorySummary() {
+    const response = await fetch(`${REPORTS_URL}/category-summary`);
+    if (!response.ok) throw new Error('Failed to load category summary');
+    return response.json();
+}
