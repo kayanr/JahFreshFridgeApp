@@ -7,6 +7,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+import org.springframework.data.domain.Pageable;
 import java.time.LocalDate;
 import java.util.List;
 
@@ -22,4 +23,9 @@ public interface FoodItemRepo extends JpaRepository<FoodItem, Long> {
         @Param("cutoff") LocalDate cutoff,
         @Param("excluded") List<FoodStatus> excluded
     );
+
+    @Query(value = "SELECT * FROM food_items WHERE status NOT IN ('CONSUMED', 'DISCARDED') " +
+            "ORDER BY CASE status WHEN 'EXPIRED' THEN 0 WHEN 'EXPIRING_SOON' THEN 1 ELSE 2 END, expiry_date ASC LIMIT 5",
+            nativeQuery = true)
+    List<FoodItem> findItemsRequiringAttention();
 }
