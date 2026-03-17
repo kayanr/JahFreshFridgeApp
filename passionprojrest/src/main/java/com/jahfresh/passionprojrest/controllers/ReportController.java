@@ -1,5 +1,6 @@
 package com.jahfresh.passionprojrest.controllers;
 
+import com.jahfresh.passionprojrest.models.CategorySummaryItem;
 import com.jahfresh.passionprojrest.models.ExpirationSummaryReport;
 import com.jahfresh.passionprojrest.models.FoodItem;
 import com.jahfresh.passionprojrest.models.FoodStatus;
@@ -38,5 +39,11 @@ public class ReportController {
         String mostWastedCategory = foodItemRepo.findMostWastedCategory().orElse(null);
 
         return new WasteSummaryReport(consumedCount, discardedCount, mostWastedCategory);
+    }
+
+    @GetMapping("/category-summary")
+    public List<CategorySummaryItem> getCategorySummary() {
+        List<FoodStatus> excluded = List.of(FoodStatus.CONSUMED, FoodStatus.DISCARDED);
+        return foodItemRepo.findCategorySummary(excluded);
     }
 }
