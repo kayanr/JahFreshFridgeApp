@@ -87,7 +87,7 @@ function renderTable(items) {
         <tr>
             <td>${item.id}</td>
             <td><a href="https://www.google.com/search?q=recipes+with+${encodeURIComponent(item.name)}" target="_blank" class="text-decoration-none">${item.name}</a></td>
-            <td>${item.description || '—'}</td>
+            <td>${item.notes || '—'}</td>
             <td>${formatDate(item.expiryDate)}</td>
             <td>${item.quantity}</td>
             <td>
@@ -192,7 +192,7 @@ async function openEditModal(id) {
         document.getElementById('foodItemModalLabel').textContent = 'Edit Food Item';
         document.getElementById('form-id').value           = item.id;
         document.getElementById('form-name').value         = item.name;
-        document.getElementById('form-description').value  = item.description || '';
+        document.getElementById('form-notes').value  = item.notes || '';
         document.getElementById('form-expiry-date').value  = item.expiryDate;
         document.getElementById('form-quantity').value     = item.quantity;
         document.getElementById('form-status').value       = item.status;
@@ -214,7 +214,7 @@ async function saveItem() {
     const id = document.getElementById('form-id').value;
     const data = {
         name:        document.getElementById('form-name').value.trim(),
-        description: document.getElementById('form-description').value.trim(),
+        notes: document.getElementById('form-notes').value.trim(),
         expiryDate:  document.getElementById('form-expiry-date').value,
         quantity:    parseInt(document.getElementById('form-quantity').value, 10),
         status:      document.getElementById('form-status').value,

@@ -54,7 +54,7 @@ public class FoodItemController {
     public ResponseEntity<FoodItem> createFoodItem(@Valid @RequestBody FoodItemDto foodItemDto) {
         FoodItem foodItem = new FoodItem();
         foodItem.setName(foodItemDto.getName());
-        foodItem.setDescription(foodItemDto.getDescription());
+        foodItem.setNotes(foodItemDto.getNotes());
         foodItem.setExpiryDate(foodItemDto.getExpiryDate());
         foodItem.setQuantity(foodItemDto.getQuantity());
         foodItem.setStatus(foodItemDto.getStatus());
@@ -71,7 +71,7 @@ public class FoodItemController {
             return ResponseEntity.notFound().build();
         }
         foodItem.setName(foodItemDto.getName());
-        foodItem.setDescription(foodItemDto.getDescription());
+        foodItem.setNotes(foodItemDto.getNotes());
         foodItem.setExpiryDate(foodItemDto.getExpiryDate());
         foodItem.setQuantity(foodItemDto.getQuantity());
         foodItem.setStatus(foodItemDto.getStatus());
