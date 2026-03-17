@@ -1,5 +1,7 @@
 let statusChart = null;
 let wasteChart = null;
+let lastUpdatedTime = null;
+let lastUpdatedInterval = null;
 
 document.addEventListener('DOMContentLoaded', () => {
     loadReport();
@@ -28,7 +30,22 @@ async function loadReport() {
     } finally {
         btn.disabled = false;
         btn.innerHTML = 'Refresh';
+        setLastUpdated();
     }
+}
+
+function setLastUpdated() {
+    lastUpdatedTime = new Date();
+    if (lastUpdatedInterval) clearInterval(lastUpdatedInterval);
+    updateLastUpdatedDisplay();
+    lastUpdatedInterval = setInterval(updateLastUpdatedDisplay, 60000);
+}
+
+function updateLastUpdatedDisplay() {
+    const el = document.getElementById('last-updated');
+    if (!lastUpdatedTime) return;
+    const mins = Math.floor((new Date() - lastUpdatedTime) / 60000);
+    el.textContent = mins === 0 ? 'Last updated: just now' : `Last updated: ${mins} min${mins > 1 ? 's' : ''} ago`;
 }
 
 function checkExpiredWarning(report) {
@@ -108,8 +125,23 @@ function renderWasteCards(waste) {
     document.getElementById('waste-consumed').textContent = waste.consumedCount;
     document.getElementById('waste-discarded').textContent = waste.discardedCount;
     document.getElementById('waste-rate').textContent = waste.totalProcessed > 0 ? `${waste.wasteRate}%` : '—';
+
+    const trendEl = document.getElementById('waste-rate-trend');
+    if (waste.wasteRateTrend === null || waste.wasteRateTrend === undefined) {
+        trendEl.textContent = '';
+    } else if (waste.wasteRateTrend < 0) {
+        trendEl.innerHTML = `<span style="color:#a8f0c6;">↓ ${Math.abs(waste.wasteRateTrend)}% from last month</span>`;
+    } else if (waste.wasteRateTrend > 0) {
+        trendEl.innerHTML = `<span style="color:#f8d7da;">↑ ${waste.wasteRateTrend}% from last month</span>`;
+    } else {
+        trendEl.innerHTML = `<span style="color:#fff9c4;">→ Same as last month</span>`;
+    }
     const categoryEl = document.getElementById('waste-most-category');
-    categoryEl.textContent = waste.mostWastedCategory ? formatCategory(waste.mostWastedCategory) : '—';
+    if (waste.mostWastedCategory) {
+        categoryEl.textContent = `${formatCategory(waste.mostWastedCategory)} (${waste.mostWastedCategoryCount} item${waste.mostWastedCategoryCount !== 1 ? 's' : ''})`;
+    } else {
+        categoryEl.textContent = '—';
+    }
 }
 
 function renderWasteChart(waste) {
@@ -175,9 +207,19 @@ function renderMonthlyActivity(monthly) {
     const monthNames = ['January', 'February', 'March', 'April', 'May', 'June',
                         'July', 'August', 'September', 'October', 'November', 'December'];
     document.getElementById('monthly-period').textContent = `${monthNames[monthly.month - 1]} ${monthly.year}`;
-    document.getElementById('monthly-added').textContent = monthly.itemsAdded;
-    document.getElementById('monthly-consumed').textContent = monthly.itemsConsumed;
-    document.getElementById('monthly-expired').textContent = monthly.itemsExpired;
+
+    const addedEl = document.getElementById('monthly-added');
+    addedEl.textContent = monthly.itemsAdded > 0 ? monthly.itemsAdded : '—';
+
+    const consumedEl = document.getElementById('monthly-consumed');
+    consumedEl.textContent = monthly.itemsConsumed > 0 ? monthly.itemsConsumed : '—';
+
+    const expiredEl = document.getElementById('monthly-expired');
+    if (monthly.itemsExpired === 0) {
+        expiredEl.innerHTML = '<span style="font-size: 1rem;">🎉 None!</span>';
+    } else {
+        expiredEl.textContent = monthly.itemsExpired;
+    }
 }
 
 function formatCategory(category) {

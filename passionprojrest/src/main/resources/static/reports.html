@@ -26,7 +26,10 @@
 <main class="container my-4">
     <div class="d-flex justify-content-between align-items-center mb-4">
         <h2 class="mb-0">Expiration Status Report</h2>
-        <button class="btn btn-outline-secondary" id="btn-refresh-report">Refresh</button>
+        <div class="text-end">
+            <button class="btn btn-outline-secondary" id="btn-refresh-report">Refresh</button>
+            <div class="text-muted small mt-1" id="last-updated"></div>
+        </div>
     </div>
 
     <!-- Alert area -->
@@ -83,13 +86,21 @@
         </div>
     </div>
 
-    <!-- Chart -->
-    <div class="row mb-4">
-        <div class="col-md-5">
+    <!-- Charts row -->
+    <div class="row mb-4" id="charts-row">
+        <div class="col-md-6">
             <div class="card shadow-sm h-100">
                 <div class="card-header bg-slate text-white fw-semibold">Status Breakdown</div>
                 <div class="card-body d-flex justify-content-center align-items-center">
                     <canvas id="status-chart" style="max-height: 260px;"></canvas>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="card shadow-sm h-100">
+                <div class="card-header bg-slate text-white fw-semibold">Consumed vs Discarded</div>
+                <div class="card-body d-flex justify-content-center align-items-center">
+                    <canvas id="waste-chart" style="max-height: 260px;"></canvas>
                 </div>
             </div>
         </div>
@@ -130,6 +141,7 @@
                     <div>
                         <div class="card-title fw-semibold mb-1">Waste Rate</div>
                         <div class="display-6 fw-bold" id="waste-rate">—</div>
+                        <small id="waste-rate-trend" class="mt-1 d-block"></small>
                     </div>
                     <div class="stat-icon">&#x1F4CA;</div>
                 </div>
@@ -148,16 +160,6 @@
         </div>
     </div>
 
-    <div class="row mb-4">
-        <div class="col-md-5">
-            <div class="card shadow-sm">
-                <div class="card-header bg-slate text-white fw-semibold">Consumed vs Discarded</div>
-                <div class="card-body d-flex justify-content-center align-items-center">
-                    <canvas id="waste-chart" style="max-height: 260px;"></canvas>
-                </div>
-            </div>
-        </div>
-    </div>
 
     <!-- Category Breakdown Report -->
     <hr class="my-4">
