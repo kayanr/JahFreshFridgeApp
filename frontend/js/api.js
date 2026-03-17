@@ -1,4 +1,5 @@
-const BASE_URL = '/api/fooditems';
+const API_HOST = 'http://localhost:8080';
+const BASE_URL = `${API_HOST}/api/fooditems`;
 
 async function getAllFoodItems(page = 0, size = 5) {
     const response = await fetch(`${BASE_URL}?page=${page}&size=${size}`);
