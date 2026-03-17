@@ -1,4 +1,5 @@
 const BASE_URL = '/api/fooditems';
+const REPORTS_URL = '/api/reports';
 
 async function getAllFoodItems(page = 0, size = 5) {
     const response = await fetch(`${BASE_URL}?page=${page}&size=${size}`);
@@ -61,5 +62,11 @@ async function getExpiringSoon() {
 async function getCategories() {
     const response = await fetch(`${BASE_URL}/categories`);
     if (!response.ok) throw new Error('Failed to load categories');
+    return response.json();
+}
+
+async function getExpirationSummary() {
+    const response = await fetch(`${REPORTS_URL}/expiration-summary`);
+    if (!response.ok) throw new Error('Failed to load expiration summary');
     return response.json();
 }
