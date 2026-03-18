@@ -76,7 +76,9 @@ function renderSummaryCards(report) {
 function renderTopExpiringTable(items) {
     const tbody = document.getElementById('report-table-body');
     lastFetchedItems = items || [];
-    document.getElementById('btn-export-csv').disabled = lastFetchedItems.length === 0;
+    const exportBtn = document.getElementById('btn-export-csv');
+    exportBtn.disabled = lastFetchedItems.length === 0;
+    exportBtn.title = lastFetchedItems.length === 0 ? 'No items to export' : 'Export table as CSV';
 
     if (lastFetchedItems.length === 0) {
         tbody.innerHTML = `<tr><td colspan="6" class="text-center text-muted py-4">No active items found.</td></tr>`;
@@ -320,6 +322,13 @@ function formatStatusBadge(status) {
 
 function exportToCSV() {
     const headers = ['Name', 'Category', 'Expiry Date', 'Days Left', 'Quantity', 'Status'];
+
+    if (lastFetchedItems.length === 0) {
+        const csv = [headers.join(','), 'No data available'].join('\n');
+        triggerDownload(csv);
+        return;
+    }
+
     const rows = lastFetchedItems.map(item => {
         const today = new Date();
         today.setHours(0, 0, 0, 0);
@@ -338,11 +347,15 @@ function exportToCSV() {
     });
 
     const csv = [headers.join(','), ...rows].join('\n');
+    triggerDownload(csv);
+}
+
+function triggerDownload(csv) {
     const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;
-    a.download = `jahfresh-items-requiring-attention-${new Date().toISOString().slice(0, 10)}.csv`;
+    a.download = `jahfreshfridge-report-${new Date().toISOString().slice(0, 10)}.csv`;
     a.click();
     URL.revokeObjectURL(url);
 }
