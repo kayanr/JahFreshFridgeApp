@@ -57,8 +57,8 @@ function checkExpiredWarning(report) {
         container.innerHTML = `
             <div class="alert alert-warning alert-dismissible fade show" role="alert">
                 ⚠️ <strong>${report.expiredCount} of your ${report.totalActive} active items are expired.</strong>
-                Consider reviewing your fridge and discarding or consuming them.<br>
-                <small>Your waste exposure rate is <strong>${wasteRate}%</strong> this period.</small>
+                Review your fridge and take action to reduce waste.<br>
+                <small>Expired Inventory Rate: <strong>${wasteRate}%</strong> this period.</small>
                 <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
             </div>`;
     } else {
@@ -138,8 +138,15 @@ function renderStatusChart(report) {
         options: {
             responsive: true,
             plugins: {
-                legend: {
-                    position: 'bottom'
+                legend: { position: 'bottom' },
+                tooltip: {
+                    callbacks: {
+                        label: (ctx) => {
+                            const total = ctx.dataset.data.reduce((a, b) => a + b, 0);
+                            const pct = total > 0 ? Math.round((ctx.parsed / total) * 100) : 0;
+                            return ` ${ctx.label}: ${ctx.parsed} (${pct}%)`;
+                        }
+                    }
                 }
             }
         }
@@ -209,7 +216,16 @@ function renderWasteChart(waste) {
         options: {
             responsive: true,
             plugins: {
-                legend: { position: 'bottom' }
+                legend: { position: 'bottom' },
+                tooltip: {
+                    callbacks: {
+                        label: (ctx) => {
+                            const total = ctx.dataset.data.reduce((a, b) => a + b, 0);
+                            const pct = total > 0 ? Math.round((ctx.parsed / total) * 100) : 0;
+                            return ` ${ctx.label}: ${ctx.parsed} (${pct}%)`;
+                        }
+                    }
+                }
             }
         }
     });
