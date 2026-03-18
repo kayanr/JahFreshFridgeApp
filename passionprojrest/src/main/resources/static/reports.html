@@ -26,7 +26,10 @@
 <main class="container my-4">
     <div class="d-flex justify-content-between align-items-center mb-4">
         <h2 class="mb-0">Expiration Status Report</h2>
-        <button class="btn btn-outline-secondary" id="btn-refresh-report">Refresh</button>
+        <div class="text-end">
+            <button class="btn btn-outline-secondary" id="btn-refresh-report">Refresh</button>
+            <div class="text-muted small mt-1" id="last-updated"></div>
+        </div>
     </div>
 
     <!-- Alert area -->
@@ -83,13 +86,21 @@
         </div>
     </div>
 
-    <!-- Chart -->
-    <div class="row mb-4">
-        <div class="col-md-5">
+    <!-- Charts row -->
+    <div class="row mb-4" id="charts-row">
+        <div class="col-md-6">
             <div class="card shadow-sm h-100">
-                <div class="card-header bg-slate text-white fw-semibold">Status Breakdown</div>
+                <div class="card-header bg-slate text-white fw-semibold">Food Status Distribution</div>
                 <div class="card-body d-flex justify-content-center align-items-center">
                     <canvas id="status-chart" style="max-height: 260px;"></canvas>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="card shadow-sm h-100">
+                <div class="card-header bg-slate text-white fw-semibold">Consumption vs Waste</div>
+                <div class="card-body d-flex justify-content-center align-items-center">
+                    <canvas id="waste-chart" style="max-height: 260px;"></canvas>
                 </div>
             </div>
         </div>
@@ -97,7 +108,7 @@
 
     <!-- Waste & Savings Report -->
     <hr class="my-4">
-    <div class="d-flex justify-content-between align-items-center mb-3">
+    <div class="d-flex justify-content-between align-items-center mb-4">
         <h4 class="mb-0">Waste &amp; Savings Report</h4>
     </div>
 
@@ -128,8 +139,9 @@
             <div class="card text-dark bg-warning shadow-sm">
                 <div class="card-body d-flex justify-content-between align-items-center">
                     <div>
-                        <div class="card-title fw-semibold mb-1">Waste Rate</div>
+                        <div class="card-title fw-semibold mb-1">Waste Rate (Consumption)</div>
                         <div class="display-6 fw-bold" id="waste-rate">—</div>
+                        <small id="waste-rate-trend" class="mt-1 d-block"></small>
                     </div>
                     <div class="stat-icon">&#x1F4CA;</div>
                 </div>
@@ -148,12 +160,73 @@
         </div>
     </div>
 
-    <div class="row mb-4">
-        <div class="col-md-5">
-            <div class="card shadow-sm">
-                <div class="card-header bg-slate text-white fw-semibold">Consumed vs Discarded</div>
-                <div class="card-body d-flex justify-content-center align-items-center">
-                    <canvas id="waste-chart" style="max-height: 260px;"></canvas>
+
+    <!-- Category Breakdown Report -->
+    <hr class="my-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h4 class="mb-0">Category Breakdown</h4>
+    </div>
+
+    <div class="card shadow-sm mb-4">
+        <div class="card-header bg-slate text-white fw-semibold">Inventory by Category</div>
+        <div class="card-body p-0">
+            <table class="table table-hover mb-0">
+                <thead class="thead-slate">
+                    <tr>
+                        <th>Category</th>
+                        <th>Total</th>
+                        <th>Fresh</th>
+                        <th>Expiring Soon</th>
+                        <th>Expired</th>
+                        <th style="min-width: 160px;">Breakdown</th>
+                    </tr>
+                </thead>
+                <tbody id="category-table-body">
+                    <tr>
+                        <td colspan="6" class="text-center text-muted py-4">Loading...</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- Monthly Activity Report -->
+    <hr class="my-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h4 class="mb-0">Monthly Activity — <span id="monthly-period">—</span></h4>
+    </div>
+
+    <div class="row g-3 mb-4">
+        <div class="col-md-4">
+            <div class="card text-white bg-slate shadow-sm">
+                <div class="card-body d-flex justify-content-between align-items-center">
+                    <div>
+                        <div class="card-title fw-semibold mb-1">Items Added</div>
+                        <div class="display-6 fw-bold" id="monthly-added">—</div>
+                    </div>
+                    <div class="stat-icon">&#x2795;</div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card text-white bg-success shadow-sm">
+                <div class="card-body d-flex justify-content-between align-items-center">
+                    <div>
+                        <div class="card-title fw-semibold mb-1">Items Consumed</div>
+                        <div class="display-6 fw-bold" id="monthly-consumed">—</div>
+                    </div>
+                    <div class="stat-icon">&#x1F37D;</div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card text-white bg-danger shadow-sm">
+                <div class="card-body d-flex justify-content-between align-items-center">
+                    <div>
+                        <div class="card-title fw-semibold mb-1">Items Expired</div>
+                        <div class="display-6 fw-bold" id="monthly-expired">—</div>
+                    </div>
+                    <div class="stat-icon">&#x274C;</div>
                 </div>
             </div>
         </div>
@@ -161,8 +234,12 @@
 
     <!-- Items Requiring Attention table -->
     <div class="card shadow-sm">
-        <div class="card-header bg-slate text-white fw-semibold">
-            Items Requiring Attention
+        <div class="card-header bg-slate text-white d-flex justify-content-between align-items-center">
+            <span class="fw-semibold">Items Requiring Attention</span>
+            <div class="d-flex align-items-center gap-3">
+                <button class="btn btn-sm btn-outline-light" id="btn-export-csv" disabled>Export CSV</button>
+                <small class="text-white-50">Sorted by urgency</small>
+            </div>
         </div>
         <div class="card-body p-0">
             <table class="table table-hover mb-0">

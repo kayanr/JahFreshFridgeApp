@@ -1,9 +1,13 @@
 let statusChart = null;
 let wasteChart = null;
+let lastUpdatedTime = null;
+let lastUpdatedInterval = null;
+let lastFetchedItems = [];
 
 document.addEventListener('DOMContentLoaded', () => {
     loadReport();
     document.getElementById('btn-refresh-report').addEventListener('click', loadReport);
+    document.getElementById('btn-export-csv').addEventListener('click', exportToCSV);
 });
 
 async function loadReport() {
@@ -12,28 +16,49 @@ async function loadReport() {
     btn.innerHTML = `<span class="spinner-border spinner-border-sm me-1" role="status"></span>Loading...`;
 
     try {
-        const [report, waste] = await Promise.all([getExpirationSummary(), getWasteSummary()]);
+        const [report, waste, categories, monthly] = await Promise.all([
+            getExpirationSummary(), getWasteSummary(), getCategorySummary(), getMonthlyActivity()
+        ]);
         renderSummaryCards(report);
         renderStatusChart(report);
         renderTopExpiringTable(report.topExpiringItems);
         checkExpiredWarning(report);
         renderWasteCards(waste);
         renderWasteChart(waste);
+        renderCategoryTable(categories);
+        renderMonthlyActivity(monthly);
     } catch (error) {
         showAlert('Failed to load report. Please try again.', 'danger');
     } finally {
         btn.disabled = false;
         btn.innerHTML = 'Refresh';
+        setLastUpdated();
     }
+}
+
+function setLastUpdated() {
+    lastUpdatedTime = new Date();
+    if (lastUpdatedInterval) clearInterval(lastUpdatedInterval);
+    updateLastUpdatedDisplay();
+    lastUpdatedInterval = setInterval(updateLastUpdatedDisplay, 60000);
+}
+
+function updateLastUpdatedDisplay() {
+    const el = document.getElementById('last-updated');
+    if (!lastUpdatedTime) return;
+    const mins = Math.floor((new Date() - lastUpdatedTime) / 60000);
+    el.textContent = mins === 0 ? 'Last updated: just now' : `Last updated: ${mins} min${mins > 1 ? 's' : ''} ago`;
 }
 
 function checkExpiredWarning(report) {
     const container = document.getElementById('alert-container');
     if (report.totalActive > 0 && (report.expiredCount / report.totalActive) > 0.3) {
+        const wasteRate = Math.round((report.expiredCount / report.totalActive) * 1000) / 10;
         container.innerHTML = `
             <div class="alert alert-warning alert-dismissible fade show" role="alert">
                 ⚠️ <strong>${report.expiredCount} of your ${report.totalActive} active items are expired.</strong>
-                Consider reviewing your fridge and discarding or consuming them.
+                Review your fridge and take action to reduce waste.<br>
+                <small>Expired Inventory Rate: <strong>${wasteRate}%</strong> this period.</small>
                 <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
             </div>`;
     } else {
@@ -50,8 +75,12 @@ function renderSummaryCards(report) {
 
 function renderTopExpiringTable(items) {
     const tbody = document.getElementById('report-table-body');
+    lastFetchedItems = items || [];
+    const exportBtn = document.getElementById('btn-export-csv');
+    exportBtn.disabled = lastFetchedItems.length === 0;
+    exportBtn.title = lastFetchedItems.length === 0 ? 'No items to export' : 'Export table as CSV';
 
-    if (!items || items.length === 0) {
+    if (lastFetchedItems.length === 0) {
         tbody.innerHTML = `<tr><td colspan="6" class="text-center text-muted py-4">No active items found.</td></tr>`;
         return;
     }
@@ -76,6 +105,25 @@ function renderStatusChart(report) {
 
     if (statusChart) {
         statusChart.destroy();
+        statusChart = null;
+    }
+
+    if (report.totalActive === 0) {
+        statusChart = new Chart(ctx, {
+            type: 'doughnut',
+            data: {
+                labels: ['No active items'],
+                datasets: [{ data: [1], backgroundColor: ['#e9ecef'], borderWidth: 0 }]
+            },
+            options: {
+                responsive: true,
+                plugins: {
+                    legend: { position: 'bottom' },
+                    tooltip: { callbacks: { label: () => 'Add items to see breakdown' } }
+                }
+            }
+        });
+        return;
     }
 
     statusChart = new Chart(ctx, {
@@ -92,8 +140,15 @@ function renderStatusChart(report) {
         options: {
             responsive: true,
             plugins: {
-                legend: {
-                    position: 'bottom'
+                legend: { position: 'bottom' },
+                tooltip: {
+                    callbacks: {
+                        label: (ctx) => {
+                            const total = ctx.dataset.data.reduce((a, b) => a + b, 0);
+                            const pct = total > 0 ? Math.round((ctx.parsed / total) * 100) : 0;
+                            return ` ${ctx.label}: ${ctx.parsed} (${pct}%)`;
+                        }
+                    }
                 }
             }
         }
@@ -104,8 +159,23 @@ function renderWasteCards(waste) {
     document.getElementById('waste-consumed').textContent = waste.consumedCount;
     document.getElementById('waste-discarded').textContent = waste.discardedCount;
     document.getElementById('waste-rate').textContent = waste.totalProcessed > 0 ? `${waste.wasteRate}%` : '—';
+
+    const trendEl = document.getElementById('waste-rate-trend');
+    if (waste.wasteRateTrend === null || waste.wasteRateTrend === undefined) {
+        trendEl.textContent = '';
+    } else if (waste.wasteRateTrend < 0) {
+        trendEl.innerHTML = `<span style="color:#a8f0c6;">↓ ${Math.abs(waste.wasteRateTrend)}% from last month</span>`;
+    } else if (waste.wasteRateTrend > 0) {
+        trendEl.innerHTML = `<span style="color:#f8d7da;">↑ ${waste.wasteRateTrend}% from last month</span>`;
+    } else {
+        trendEl.innerHTML = `<span style="color:#fff9c4;">→ Same as last month</span>`;
+    }
     const categoryEl = document.getElementById('waste-most-category');
-    categoryEl.textContent = waste.mostWastedCategory ? formatCategory(waste.mostWastedCategory) : '—';
+    if (waste.mostWastedCategory) {
+        categoryEl.textContent = `${formatCategory(waste.mostWastedCategory)} (${waste.mostWastedCategoryCount} item${waste.mostWastedCategoryCount !== 1 ? 's' : ''})`;
+    } else {
+        categoryEl.textContent = '—';
+    }
 }
 
 function renderWasteChart(waste) {
@@ -113,6 +183,25 @@ function renderWasteChart(waste) {
 
     if (wasteChart) {
         wasteChart.destroy();
+        wasteChart = null;
+    }
+
+    if (waste.totalProcessed === 0) {
+        wasteChart = new Chart(ctx, {
+            type: 'doughnut',
+            data: {
+                labels: ['No processed items'],
+                datasets: [{ data: [1], backgroundColor: ['#e9ecef'], borderWidth: 0 }]
+            },
+            options: {
+                responsive: true,
+                plugins: {
+                    legend: { position: 'bottom' },
+                    tooltip: { callbacks: { label: () => 'Mark items consumed or discarded to see breakdown' } }
+                }
+            }
+        });
+        return;
     }
 
     wasteChart = new Chart(ctx, {
@@ -129,10 +218,70 @@ function renderWasteChart(waste) {
         options: {
             responsive: true,
             plugins: {
-                legend: { position: 'bottom' }
+                legend: { position: 'bottom' },
+                tooltip: {
+                    callbacks: {
+                        label: (ctx) => {
+                            const total = ctx.dataset.data.reduce((a, b) => a + b, 0);
+                            const pct = total > 0 ? Math.round((ctx.parsed / total) * 100) : 0;
+                            return ` ${ctx.label}: ${ctx.parsed} (${pct}%)`;
+                        }
+                    }
+                }
             }
         }
     });
+}
+
+function renderCategoryTable(categories) {
+    const tbody = document.getElementById('category-table-body');
+
+    if (!categories || categories.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="6" class="text-center text-muted py-4">No categorised items found.</td></tr>`;
+        return;
+    }
+
+    tbody.innerHTML = categories.map(cat => {
+        const total = cat.total || 1;
+        const freshPct = Math.round((cat.freshCount / total) * 100);
+        const expiringSoonPct = Math.round((cat.expiringSoonCount / total) * 100);
+        const expiredPct = Math.round((cat.expiredCount / total) * 100);
+
+        return `
+        <tr>
+            <td class="fw-semibold">${formatCategory(cat.category)}</td>
+            <td>${cat.total}</td>
+            <td><span class="badge bg-success">${cat.freshCount}</span></td>
+            <td><span class="badge bg-warning text-dark">${cat.expiringSoonCount}</span></td>
+            <td><span class="badge bg-danger">${cat.expiredCount}</span></td>
+            <td>
+                <div class="progress" style="height: 16px;">
+                    <div class="progress-bar bg-success" style="width: ${freshPct}%" title="Fresh"></div>
+                    <div class="progress-bar bg-warning" style="width: ${expiringSoonPct}%" title="Expiring Soon"></div>
+                    <div class="progress-bar bg-danger" style="width: ${expiredPct}%" title="Expired"></div>
+                </div>
+            </td>
+        </tr>`;
+    }).join('');
+}
+
+function renderMonthlyActivity(monthly) {
+    const monthNames = ['January', 'February', 'March', 'April', 'May', 'June',
+                        'July', 'August', 'September', 'October', 'November', 'December'];
+    document.getElementById('monthly-period').textContent = `${monthNames[monthly.month - 1]} ${monthly.year}`;
+
+    const addedEl = document.getElementById('monthly-added');
+    addedEl.textContent = monthly.itemsAdded > 0 ? monthly.itemsAdded : '—';
+
+    const consumedEl = document.getElementById('monthly-consumed');
+    consumedEl.textContent = monthly.itemsConsumed > 0 ? monthly.itemsConsumed : '—';
+
+    const expiredEl = document.getElementById('monthly-expired');
+    if (monthly.itemsExpired === 0) {
+        expiredEl.innerHTML = '<span style="font-size: 1rem;">🎉 None!</span>';
+    } else {
+        expiredEl.textContent = monthly.itemsExpired;
+    }
 }
 
 function formatCategory(category) {
@@ -169,6 +318,46 @@ function formatStatusBadge(status) {
     };
     const cls = badges[status] || 'bg-secondary';
     return `<span class="badge ${cls}">${status.replace('_', ' ')}</span>`;
+}
+
+function exportToCSV() {
+    const headers = ['Name', 'Category', 'Expiry Date', 'Days Left', 'Quantity', 'Status'];
+
+    if (lastFetchedItems.length === 0) {
+        const csv = [headers.join(','), 'No data available'].join('\n');
+        triggerDownload(csv);
+        return;
+    }
+
+    const rows = lastFetchedItems.map(item => {
+        const today = new Date();
+        today.setHours(0, 0, 0, 0);
+        const expiry = new Date(item.expiryDate + 'T00:00:00');
+        const days = Math.round((expiry - today) / (1000 * 60 * 60 * 24));
+        const daysLabel = days === 0 ? 'Today' : days > 0 ? `${days} day(s)` : `${Math.abs(days)} day(s) ago`;
+
+        return [
+            `"${item.name}"`,
+            formatCategory(item.category),
+            formatDate(item.expiryDate),
+            daysLabel,
+            item.quantity,
+            item.status.replace('_', ' ')
+        ].join(',');
+    });
+
+    const csv = [headers.join(','), ...rows].join('\n');
+    triggerDownload(csv);
+}
+
+function triggerDownload(csv) {
+    const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `jahfreshfridge-report-${new Date().toISOString().slice(0, 10)}.csv`;
+    a.click();
+    URL.revokeObjectURL(url);
 }
 
 function showAlert(message, type) {

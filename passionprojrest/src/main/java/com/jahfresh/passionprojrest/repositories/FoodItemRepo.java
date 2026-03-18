@@ -7,7 +7,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
-import org.springframework.data.domain.Pageable;
+import com.jahfresh.passionprojrest.models.CategorySummaryItem;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
@@ -26,7 +26,8 @@ public interface FoodItemRepo extends JpaRepository<FoodItem, Long> {
     );
 
     @Query(value = "SELECT * FROM food_items WHERE status NOT IN ('CONSUMED', 'DISCARDED') " +
-            "ORDER BY CASE status WHEN 'EXPIRED' THEN 0 WHEN 'EXPIRING_SOON' THEN 1 ELSE 2 END, expiry_date ASC LIMIT 5",
+            "ORDER BY CASE status WHEN 'EXPIRED' THEN 0 WHEN 'EXPIRING_SOON' THEN 1 ELSE 2 END, " +
+            "ABS(DATEDIFF(expiry_date, CURRENT_DATE)) ASC LIMIT 5",
             nativeQuery = true)
     List<FoodItem> findItemsRequiringAttention();
 
@@ -34,4 +35,31 @@ public interface FoodItemRepo extends JpaRepository<FoodItem, Long> {
             "GROUP BY category ORDER BY COUNT(*) DESC LIMIT 1",
             nativeQuery = true)
     Optional<String> findMostWastedCategory();
+
+    @Query(value = "SELECT COUNT(*) FROM food_items WHERE status = 'DISCARDED' AND category = :category",
+            nativeQuery = true)
+    long countDiscardedByCategory(@Param("category") String category);
+
+    @Query(value = "SELECT COUNT(*) FROM food_items WHERE status = 'DISCARDED' AND MONTH(updated_date) = :month AND YEAR(updated_date) = :year",
+            nativeQuery = true)
+    long countDiscardedInMonth(@Param("month") int month, @Param("year") int year);
+
+    @Query(value = "SELECT COUNT(*) FROM food_items WHERE MONTH(created_date) = :month AND YEAR(created_date) = :year",
+            nativeQuery = true)
+    long countItemsAddedInMonth(@Param("month") int month, @Param("year") int year);
+
+    @Query(value = "SELECT COUNT(*) FROM food_items WHERE status = 'CONSUMED' AND MONTH(updated_date) = :month AND YEAR(updated_date) = :year",
+            nativeQuery = true)
+    long countItemsConsumedInMonth(@Param("month") int month, @Param("year") int year);
+
+    @Query(value = "SELECT COUNT(*) FROM food_items WHERE status = 'EXPIRED' AND MONTH(expiry_date) = :month AND YEAR(expiry_date) = :year",
+            nativeQuery = true)
+    long countItemsExpiredInMonth(@Param("month") int month, @Param("year") int year);
+
+    @Query("SELECT new com.jahfresh.passionprojrest.models.CategorySummaryItem(f.category, COUNT(f), " +
+            "SUM(CASE WHEN f.status = com.jahfresh.passionprojrest.models.FoodStatus.FRESH THEN 1L ELSE 0L END), " +
+            "SUM(CASE WHEN f.status = com.jahfresh.passionprojrest.models.FoodStatus.EXPIRING_SOON THEN 1L ELSE 0L END), " +
+            "SUM(CASE WHEN f.status = com.jahfresh.passionprojrest.models.FoodStatus.EXPIRED THEN 1L ELSE 0L END)) " +
+            "FROM FoodItem f WHERE f.status NOT IN :excluded AND f.category IS NOT NULL GROUP BY f.category ORDER BY f.category")
+    List<CategorySummaryItem> findCategorySummary(@Param("excluded") List<FoodStatus> excluded);
 }

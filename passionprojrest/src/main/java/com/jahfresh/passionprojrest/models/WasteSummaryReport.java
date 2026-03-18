@@ -7,8 +7,11 @@ public class WasteSummaryReport {
     private long totalProcessed;
     private double wasteRate;
     private String mostWastedCategory;
+    private long mostWastedCategoryCount;
+    private Double wasteRateTrend;
 
-    public WasteSummaryReport(long consumedCount, long discardedCount, String mostWastedCategory) {
+    public WasteSummaryReport(long consumedCount, long discardedCount, String mostWastedCategory,
+                               long mostWastedCategoryCount, Double wasteRateTrend) {
         this.consumedCount = consumedCount;
         this.discardedCount = discardedCount;
         this.totalProcessed = consumedCount + discardedCount;
@@ -16,6 +19,8 @@ public class WasteSummaryReport {
                 ? Math.round((discardedCount * 100.0 / totalProcessed) * 10) / 10.0
                 : 0.0;
         this.mostWastedCategory = mostWastedCategory;
+        this.mostWastedCategoryCount = mostWastedCategoryCount;
+        this.wasteRateTrend = wasteRateTrend;
     }
 
     public long getConsumedCount() { return consumedCount; }
@@ -23,4 +28,6 @@ public class WasteSummaryReport {
     public long getTotalProcessed() { return totalProcessed; }
     public double getWasteRate() { return wasteRate; }
     public String getMostWastedCategory() { return mostWastedCategory; }
+    public long getMostWastedCategoryCount() { return mostWastedCategoryCount; }
+    public Double getWasteRateTrend() { return wasteRateTrend; }
 }
