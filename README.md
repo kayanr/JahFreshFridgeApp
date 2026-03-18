@@ -14,8 +14,12 @@ A Spring Boot REST API application with a Vanilla JS frontend that helps you tra
 - Paginated food items table (5 items per page)
 - Recipe suggestions — click any item name to search Google recipes
 - Mark items as Consumed or Discarded
-- **Expiration Status Report** — summary cards, Items Requiring Attention table with Days Left column, and a Chart.js status breakdown chart
-- **Waste & Savings Report** — consumed vs discarded counts, waste rate %, most wasted category, and a Chart.js doughnut chart
+- **Expiration Status Report** — summary cards, Items Requiring Attention table sorted by urgency with Days Left column, and a Food Status Distribution doughnut chart
+- **Waste & Savings Report** — consumed vs discarded counts, Waste Rate (Consumption) %, most wasted category, month-over-month trend indicator, and a Consumption vs Waste doughnut chart
+- **Category Breakdown Report** — per-category totals with Fresh / Expiring Soon / Expired counts and a colour-coded progress bar
+- **Monthly Activity Report** — items added, consumed, and expired for the current month
+- CSV export of Items Requiring Attention table with branded filename
+- Graceful empty states on all charts and tables when no data is available
 - Responsive web interface
 
 ## Tech Stack
@@ -28,6 +32,7 @@ A Spring Boot REST API application with a Vanilla JS frontend that helps you tra
 - **Scheduling:** Spring Task Scheduling
 - **Frontend:** Vanilla JavaScript, HTML5, CSS3
 - **Styling:** Bootstrap 5
+- **Charts:** Chart.js
 - **Build Tool:** Maven
 
 ## Pages
@@ -37,7 +42,7 @@ A Spring Boot REST API application with a Vanilla JS frontend that helps you tra
 | Home | `/` | Landing page |
 | My Fridge | `/fooditems.html` | CRUD, search, filter, sort, pagination |
 | Dashboard | `/dashboard.html` | Live stats cards per status |
-| Reports | `/reports.html` | Expiration report and waste summary with charts |
+| Reports | `/reports.html` | Expiration, Waste & Savings, Category Breakdown, and Monthly Activity reports |
 
 ## Getting Started
 
@@ -58,7 +63,11 @@ A Spring Boot REST API application with a Vanilla JS frontend that helps you tra
    CREATE DATABASE refrigeratordb;
    ```
 
-3. Update `application.properties` with your database credentials
+3. Copy the example properties file and update with your database credentials
+   ```bash
+   cp passionprojrest/src/main/resources/application.properties.example \
+      passionprojrest/src/main/resources/application.properties
+   ```
    ```properties
    spring.datasource.username=your_username
    spring.datasource.password=your_password
@@ -73,6 +82,8 @@ A Spring Boot REST API application with a Vanilla JS frontend that helps you tra
 
 ## API Endpoints
 
+### Food Items
+
 | Method | Endpoint | Description |
 |--------|----------|-------------|
 | GET | `/api/fooditems?page=0&size=5` | Get all food items (paginated) |
@@ -84,11 +95,19 @@ A Spring Boot REST API application with a Vanilla JS frontend that helps you tra
 | GET | `/api/fooditems/stats` | Get counts by status |
 | GET | `/api/fooditems/categories` | Get all available categories |
 | POST | `/api/fooditems/refresh-statuses` | Manually trigger expiry status update |
-| GET | `/api/reports/expiration-summary` | Get expiration report with items requiring attention |
-| GET | `/api/reports/waste-summary` | Get waste and savings report |
+
+### Reports
+
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| GET | `/api/reports/expiration-summary` | Expiration counts and top items requiring attention |
+| GET | `/api/reports/waste-summary` | Consumed vs discarded, waste rate, and month-over-month trend |
+| GET | `/api/reports/category-summary` | Per-category breakdown of item statuses |
+| GET | `/api/reports/monthly-activity` | Items added, consumed, and expired in the current month |
 
 ## Future Enhancements
 
 - [ ] User authentication and personal fridge per user
 - [ ] Email notifications for expiring items
 - [ ] Grocery shopping list
+- [ ] Deploy to cloud (Railway / Render)
