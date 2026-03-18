@@ -10,26 +10,38 @@ function authHeaders(extraHeaders = {}) {
     };
 }
 
-async function getAllFoodItems(page = 0, size = 5) {
-    const response = await fetch(`${BASE_URL}?page=${page}&size=${size}`, {
-        headers: authHeaders()
+// Central fetch wrapper — redirects to login on 401 (expired or missing token)
+async function fetchWithAuth(url, options = {}) {
+    const response = await fetch(url, {
+        ...options,
+        headers: authHeaders(options.headers || {})
     });
+
+    if (response.status === 401) {
+        localStorage.removeItem('token');
+        window.location.href = '/login.html';
+        return;
+    }
+
+    return response;
+}
+
+async function getAllFoodItems(page = 0, size = 5) {
+    const response = await fetchWithAuth(`${BASE_URL}?page=${page}&size=${size}`);
     if (!response.ok) throw new Error('Failed to load food items');
     return response.json();
 }
 
 async function getFoodItem(id) {
-    const response = await fetch(`${BASE_URL}/${id}`, {
-        headers: authHeaders()
-    });
+    const response = await fetchWithAuth(`${BASE_URL}/${id}`);
     if (!response.ok) throw new Error(`Food item ${id} not found`);
     return response.json();
 }
 
 async function createFoodItem(data) {
-    const response = await fetch(BASE_URL, {
+    const response = await fetchWithAuth(BASE_URL, {
         method: 'POST',
-        headers: authHeaders({ 'Content-Type': 'application/json' }),
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(data)
     });
     if (!response.ok) throw new Error('Failed to create food item');
@@ -37,9 +49,9 @@ async function createFoodItem(data) {
 }
 
 async function updateFoodItem(id, data) {
-    const response = await fetch(`${BASE_URL}/${id}`, {
+    const response = await fetchWithAuth(`${BASE_URL}/${id}`, {
         method: 'PUT',
-        headers: authHeaders({ 'Content-Type': 'application/json' }),
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(data)
     });
     if (!response.ok) throw new Error('Failed to update food item');
@@ -47,73 +59,53 @@ async function updateFoodItem(id, data) {
 }
 
 async function deleteFoodItem(id) {
-    const response = await fetch(`${BASE_URL}/${id}`, {
-        method: 'DELETE',
-        headers: authHeaders()
-    });
+    const response = await fetchWithAuth(`${BASE_URL}/${id}`, { method: 'DELETE' });
     if (!response.ok) throw new Error('Failed to delete food item');
 }
 
 async function refreshStatuses() {
-    const response = await fetch(`${BASE_URL}/refresh-statuses`, {
-        method: 'POST',
-        headers: authHeaders()
-    });
+    const response = await fetchWithAuth(`${BASE_URL}/refresh-statuses`, { method: 'POST' });
     if (!response.ok) throw new Error('Failed to refresh statuses');
 }
 
 async function getStats() {
-    const response = await fetch(`${BASE_URL}/stats`, {
-        headers: authHeaders()
-    });
+    const response = await fetchWithAuth(`${BASE_URL}/stats`);
     if (!response.ok) throw new Error('Failed to load stats');
     return response.json();
 }
 
 async function getExpiringSoon() {
-    const response = await fetch(`${BASE_URL}/expiring-soon`, {
-        headers: authHeaders()
-    });
+    const response = await fetchWithAuth(`${BASE_URL}/expiring-soon`);
     if (!response.ok) throw new Error('Failed to load expiring soon items');
     return response.json();
 }
 
 async function getCategories() {
-    const response = await fetch(`${BASE_URL}/categories`, {
-        headers: authHeaders()
-    });
+    const response = await fetchWithAuth(`${BASE_URL}/categories`);
     if (!response.ok) throw new Error('Failed to load categories');
     return response.json();
 }
 
 async function getExpirationSummary() {
-    const response = await fetch(`${REPORTS_URL}/expiration-summary`, {
-        headers: authHeaders()
-    });
+    const response = await fetchWithAuth(`${REPORTS_URL}/expiration-summary`);
     if (!response.ok) throw new Error('Failed to load expiration summary');
     return response.json();
 }
 
 async function getWasteSummary() {
-    const response = await fetch(`${REPORTS_URL}/waste-summary`, {
-        headers: authHeaders()
-    });
+    const response = await fetchWithAuth(`${REPORTS_URL}/waste-summary`);
     if (!response.ok) throw new Error('Failed to load waste summary');
     return response.json();
 }
 
 async function getCategorySummary() {
-    const response = await fetch(`${REPORTS_URL}/category-summary`, {
-        headers: authHeaders()
-    });
+    const response = await fetchWithAuth(`${REPORTS_URL}/category-summary`);
     if (!response.ok) throw new Error('Failed to load category summary');
     return response.json();
 }
 
 async function getMonthlyActivity() {
-    const response = await fetch(`${REPORTS_URL}/monthly-activity`, {
-        headers: authHeaders()
-    });
+    const response = await fetchWithAuth(`${REPORTS_URL}/monthly-activity`);
     if (!response.ok) throw new Error('Failed to load monthly activity');
     return response.json();
 }

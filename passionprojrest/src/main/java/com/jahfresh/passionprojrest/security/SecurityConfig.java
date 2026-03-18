@@ -34,7 +34,7 @@ public class SecurityConfig {
             .authorizeHttpRequests(auth -> auth
                 // Public routes — no token needed
                 .requestMatchers("/api/auth/**").permitAll()
-                .requestMatchers("/", "/index.html", "/login.html", "/register.html").permitAll()
+                .requestMatchers("/", "/*.html").permitAll()
                 .requestMatchers("/css/**", "/js/**", "/images/**").permitAll()
                 // Everything else requires a valid JWT
                 .anyRequest().authenticated()
