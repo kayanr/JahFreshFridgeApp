@@ -1,6 +1,6 @@
 # JahFresh Fridge - Food Expiration Tracker
 
-A Spring Boot REST API application with a Vanilla JS frontend that helps you track food items in your refrigerator, monitor expiration dates, and reduce food waste.
+A Spring Boot REST API application with a Vanilla JS frontend that helps you track food items in your refrigerator, monitor expiration dates, and reduce food waste. Includes JWT-based user authentication so each user manages their own fridge.
 
 ## Features
 
@@ -20,6 +20,7 @@ A Spring Boot REST API application with a Vanilla JS frontend that helps you tra
 - **Monthly Activity Report** — items added, consumed, and expired for the current month
 - CSV export of Items Requiring Attention table with branded filename
 - Graceful empty states on all charts and tables when no data is available
+- **User Authentication** — register and login with JWT tokens, protected API endpoints, logout from any page
 - Responsive web interface
 
 ## Tech Stack
@@ -30,6 +31,7 @@ A Spring Boot REST API application with a Vanilla JS frontend that helps you tra
 - **ORM:** Spring Data JPA / Hibernate
 - **Validation:** Jakarta Validation (spring-boot-starter-validation)
 - **Scheduling:** Spring Task Scheduling
+- **Authentication:** Spring Security, JWT (JJWT 0.11.5), BCrypt
 - **Frontend:** Vanilla JavaScript, HTML5, CSS3
 - **Styling:** Bootstrap 5
 - **Charts:** Chart.js
@@ -37,12 +39,14 @@ A Spring Boot REST API application with a Vanilla JS frontend that helps you tra
 
 ## Pages
 
-| Page | URL | Description |
-|---|---|---|
-| Home | `/` | Landing page |
-| My Fridge | `/fooditems.html` | CRUD, search, filter, sort, pagination |
-| Dashboard | `/dashboard.html` | Live stats cards per status |
-| Reports | `/reports.html` | Expiration, Waste & Savings, Category Breakdown, and Monthly Activity reports |
+| Page | URL | Description | Auth Required |
+|---|---|---|---|
+| Home | `/` | Landing page | No |
+| Login | `/login.html` | Sign in and receive JWT token | No |
+| Register | `/register.html` | Create a new account | No |
+| My Fridge | `/fooditems.html` | CRUD, search, filter, sort, pagination | Yes |
+| Dashboard | `/dashboard.html` | Live stats cards per status | Yes |
+| Reports | `/reports.html` | Expiration, Waste & Savings, Category Breakdown, and Monthly Activity reports | Yes |
 
 ## Getting Started
 
@@ -96,6 +100,15 @@ A Spring Boot REST API application with a Vanilla JS frontend that helps you tra
 | GET | `/api/fooditems/categories` | Get all available categories |
 | POST | `/api/fooditems/refresh-statuses` | Manually trigger expiry status update |
 
+### Authentication
+
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| POST | `/api/auth/register` | Register a new user account |
+| POST | `/api/auth/login` | Login and receive a JWT token |
+
+> All food item and report endpoints require a valid JWT in the `Authorization: Bearer <token>` header.
+
 ### Reports
 
 | Method | Endpoint | Description |
@@ -107,7 +120,7 @@ A Spring Boot REST API application with a Vanilla JS frontend that helps you tra
 
 ## Future Enhancements
 
-- [ ] User authentication and personal fridge per user
+- [ ] Scope food items per user — each user sees only their own fridge
 - [ ] Email notifications for expiring items
 - [ ] Grocery shopping list
 - [ ] Deploy to cloud (Railway / Render)
