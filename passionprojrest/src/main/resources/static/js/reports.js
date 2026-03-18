@@ -3,11 +3,15 @@ let wasteChart = null;
 let lastUpdatedTime = null;
 let lastUpdatedInterval = null;
 let lastFetchedItems = [];
+let lastReport = null;
+let lastWaste = null;
+let lastCategories = null;
+let lastMonthly = null;
 
 document.addEventListener('DOMContentLoaded', () => {
     loadReport();
     document.getElementById('btn-refresh-report').addEventListener('click', loadReport);
-    document.getElementById('btn-export-csv').addEventListener('click', exportToCSV);
+    document.getElementById('btn-export-full').addEventListener('click', exportFullReport);
 });
 
 async function loadReport() {
@@ -19,6 +23,10 @@ async function loadReport() {
         const [report, waste, categories, monthly] = await Promise.all([
             getExpirationSummary(), getWasteSummary(), getCategorySummary(), getMonthlyActivity()
         ]);
+        lastReport = report;
+        lastWaste = waste;
+        lastCategories = categories;
+        lastMonthly = monthly;
         renderSummaryCards(report);
         renderStatusChart(report);
         renderTopExpiringTable(report.topExpiringItems);
@@ -32,6 +40,7 @@ async function loadReport() {
     } finally {
         btn.disabled = false;
         btn.innerHTML = 'Refresh';
+        document.getElementById('btn-export-full').disabled = !lastReport;
         setLastUpdated();
     }
 }
@@ -76,9 +85,6 @@ function renderSummaryCards(report) {
 function renderTopExpiringTable(items) {
     const tbody = document.getElementById('report-table-body');
     lastFetchedItems = items || [];
-    const exportBtn = document.getElementById('btn-export-csv');
-    exportBtn.disabled = lastFetchedItems.length === 0;
-    exportBtn.title = lastFetchedItems.length === 0 ? 'No items to export' : 'Export table as CSV';
 
     if (lastFetchedItems.length === 0) {
         tbody.innerHTML = `<tr><td colspan="6" class="text-center text-muted py-4">No active items found.</td></tr>`;
@@ -320,34 +326,92 @@ function formatStatusBadge(status) {
     return `<span class="badge ${cls}">${status.replace('_', ' ')}</span>`;
 }
 
-function exportToCSV() {
-    const headers = ['Name', 'Category', 'Expiry Date', 'Days Left', 'Quantity', 'Status'];
 
+function exportFullReport() {
+    if (!lastReport) return;
+
+    const today = new Date();
+    const monthNames = ['January','February','March','April','May','June',
+                        'July','August','September','October','November','December'];
+    const sections = [];
+
+    // Header
+    sections.push('JahFresh Fridge — Full Report');
+    sections.push(`Export Date,${today.toISOString().slice(0, 10)}`);
+    sections.push('');
+
+    // Expiration Summary
+    sections.push('=== EXPIRATION SUMMARY ===');
+    sections.push(`Total Active,${lastReport.totalActive}`);
+    sections.push(`Fresh,${lastReport.freshCount}`);
+    sections.push(`Expiring Soon,${lastReport.expiringSoonCount}`);
+    sections.push(`Expired,${lastReport.expiredCount}`);
+    sections.push('');
+
+    // Items Requiring Attention
+    sections.push('Items Requiring Attention');
+    sections.push('Name,Category,Expiry Date,Days Left,Quantity,Status');
     if (lastFetchedItems.length === 0) {
-        const csv = [headers.join(','), 'No data available'].join('\n');
-        triggerDownload(csv);
-        return;
+        sections.push('No active items');
+    } else {
+        lastFetchedItems.forEach(item => {
+            const expiry = new Date(item.expiryDate + 'T00:00:00');
+            const days = Math.round((expiry - today) / (1000 * 60 * 60 * 24));
+            const daysLabel = days === 0 ? 'Today' : days > 0 ? `${days} day(s)` : `${Math.abs(days)} day(s) ago`;
+            sections.push([
+                `"${item.name}"`,
+                formatCategory(item.category),
+                formatDate(item.expiryDate),
+                daysLabel,
+                item.quantity,
+                item.status.replace('_', ' ')
+            ].join(','));
+        });
+    }
+    sections.push('');
+
+    // Waste & Savings
+    sections.push('=== WASTE & SAVINGS ===');
+    if (lastWaste) {
+        sections.push(`Consumed,${lastWaste.consumedCount}`);
+        sections.push(`Discarded,${lastWaste.discardedCount}`);
+        sections.push(`Waste Rate (Consumption),${lastWaste.totalProcessed > 0 ? lastWaste.wasteRate + '%' : '—'}`);
+        sections.push(`Most Wasted Category,${lastWaste.mostWastedCategory ? formatCategory(lastWaste.mostWastedCategory) + ' (' + lastWaste.mostWastedCategoryCount + ' items)' : '—'}`);
+    } else {
+        sections.push('No data available');
+    }
+    sections.push('');
+
+    // Category Breakdown
+    sections.push('=== CATEGORY BREAKDOWN ===');
+    sections.push('Category,Total,Fresh,Expiring Soon,Expired');
+    if (lastCategories && lastCategories.length > 0) {
+        lastCategories.forEach(cat => {
+            sections.push([
+                formatCategory(cat.category),
+                cat.total,
+                cat.freshCount,
+                cat.expiringSoonCount,
+                cat.expiredCount
+            ].join(','));
+        });
+    } else {
+        sections.push('No data available');
+    }
+    sections.push('');
+
+    // Monthly Activity
+    sections.push('=== MONTHLY ACTIVITY ===');
+    if (lastMonthly) {
+        sections.push(`Period,${monthNames[lastMonthly.month - 1]} ${lastMonthly.year}`);
+        sections.push(`Items Added,${lastMonthly.itemsAdded}`);
+        sections.push(`Items Consumed,${lastMonthly.itemsConsumed}`);
+        sections.push(`Items Expired,${lastMonthly.itemsExpired}`);
+    } else {
+        sections.push('No data available');
     }
 
-    const rows = lastFetchedItems.map(item => {
-        const today = new Date();
-        today.setHours(0, 0, 0, 0);
-        const expiry = new Date(item.expiryDate + 'T00:00:00');
-        const days = Math.round((expiry - today) / (1000 * 60 * 60 * 24));
-        const daysLabel = days === 0 ? 'Today' : days > 0 ? `${days} day(s)` : `${Math.abs(days)} day(s) ago`;
-
-        return [
-            `"${item.name}"`,
-            formatCategory(item.category),
-            formatDate(item.expiryDate),
-            daysLabel,
-            item.quantity,
-            item.status.replace('_', ' ')
-        ].join(',');
-    });
-
-    const csv = [headers.join(','), ...rows].join('\n');
-    triggerDownload(csv);
+    triggerDownload(sections.join('\n'));
 }
 
 function triggerDownload(csv) {
