@@ -1,5 +1,6 @@
 package com.jahfresh.passionprojrest.models;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 
 import java.time.LocalDate;
@@ -25,6 +26,11 @@ public class FoodItem {
 
     @Enumerated(EnumType.STRING)
     private FoodCategory category;
+
+    @JsonIgnore
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_id")
+    private User user;
 
     public Long getId() {
         return id;
@@ -92,5 +98,13 @@ public class FoodItem {
 
     public void setCategory(FoodCategory category) {
         this.category = category;
+    }
+
+    public User getUser() {
+        return user;
+    }
+
+    public void setUser(User user) {
+        this.user = user;
     }
 }
