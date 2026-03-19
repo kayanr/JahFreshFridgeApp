@@ -18,9 +18,10 @@ A Spring Boot REST API application with a Vanilla JS frontend that helps you tra
 - **Waste & Savings Report** — consumed vs discarded counts, Waste Rate (Consumption) %, most wasted category, month-over-month trend indicator, and a Consumption vs Waste doughnut chart
 - **Category Breakdown Report** — per-category totals with Fresh / Expiring Soon / Expired counts and a colour-coded progress bar
 - **Monthly Activity Report** — items added, consumed, and expired for the current month
-- CSV export of Items Requiring Attention table with branded filename
+- Export Full Report as CSV — covers all four report sections in one structured file with branded filename
 - Graceful empty states on all charts and tables when no data is available
 - **User Authentication** — register and login with JWT tokens, protected API endpoints, logout from any page
+- **Per-user data scoping** — each user sees only their own fridge; food items and all report data are scoped to the authenticated user
 - Responsive web interface
 
 ## Tech Stack
@@ -120,7 +121,6 @@ A Spring Boot REST API application with a Vanilla JS frontend that helps you tra
 
 ## Future Enhancements
 
-- [ ] Scope food items per user — each user sees only their own fridge
 - [ ] Email notifications for expiring items
 - [ ] Grocery shopping list
 - [ ] Deploy to cloud (Railway / Render)
