@@ -38,6 +38,14 @@ A Spring Boot REST API application with a Vanilla JS frontend that helps you tra
 - **Charts:** Chart.js
 - **Build Tool:** Maven
 
+## Screenshots
+
+### My Fridge
+![My Fridge](passionprojrest/src/main/resources/static/images/fooditems-page.png)
+
+### Reports
+![Reports](passionprojrest/src/main/resources/static/images/reports-page.png)
+
 ## Pages
 
 | Page | URL | Description | Auth Required |
