@@ -1,6 +1,45 @@
 const BASE_URL = '/api/fooditems';
 const REPORTS_URL = '/api/reports';
 
+// ── Shared UI helpers ──────────────────────────────────────────────────────
+
+function showAlert(message, type = 'success') {
+    const container = document.getElementById('alert-container');
+    container.innerHTML = `
+        <div class="alert alert-${type} alert-dismissible fade show" role="alert">
+            ${message}
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>`;
+    setTimeout(() => {
+        const alert = container.querySelector('.alert');
+        if (alert) bootstrap.Alert.getOrCreateInstance(alert).close();
+    }, 4000);
+}
+
+function formatDate(dateStr) {
+    if (!dateStr) return '—';
+    const date = dateStr.includes('T') ? new Date(dateStr) : new Date(dateStr + 'T00:00:00');
+    return date.toLocaleDateString('en-US', {
+        year: 'numeric', month: 'short', day: 'numeric'
+    });
+}
+
+async function loadExpiringSoonBanner() {
+    try {
+        const items = await getExpiringSoon();
+        const banner = document.getElementById('expiring-soon-banner');
+        const message = document.getElementById('expiring-soon-message');
+        if (items.length > 0) {
+            message.textContent = `${items.length} item${items.length > 1 ? 's are' : ' is'} expiring within 3 days.`;
+            banner.classList.remove('d-none');
+        } else {
+            banner.classList.add('d-none');
+        }
+    } catch (error) {
+        // Silently fail — banner is non-critical
+    }
+}
+
 // Reads the JWT from localStorage and returns it as an Authorization header
 function authHeaders(extraHeaders = {}) {
     const token = localStorage.getItem('token');

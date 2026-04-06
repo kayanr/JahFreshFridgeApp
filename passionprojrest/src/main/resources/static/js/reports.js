@@ -307,13 +307,6 @@ function formatDaysRemaining(dateStr) {
     return `<span class="badge bg-danger">${Math.abs(days)} day${Math.abs(days) === 1 ? '' : 's'} ago</span>`;
 }
 
-function formatDate(dateStr) {
-    if (!dateStr) return '—';
-    return new Date(dateStr + 'T00:00:00').toLocaleDateString('en-US', {
-        year: 'numeric', month: 'short', day: 'numeric'
-    });
-}
-
 function formatStatusBadge(status) {
     const badges = {
         FRESH: 'bg-success',
@@ -424,11 +417,3 @@ function triggerDownload(csv) {
     URL.revokeObjectURL(url);
 }
 
-function showAlert(message, type) {
-    const container = document.getElementById('alert-container');
-    container.innerHTML = `
-        <div class="alert alert-${type} alert-dismissible fade show" role="alert">
-            ${message}
-            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-        </div>`;
-}

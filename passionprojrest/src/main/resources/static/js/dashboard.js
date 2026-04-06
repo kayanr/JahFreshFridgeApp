@@ -1,18 +1,3 @@
-// ── Helpers ────────────────────────────────────────────────────────────────
-
-function showAlert(message, type = 'success') {
-    const container = document.getElementById('alert-container');
-    container.innerHTML = `
-        <div class="alert alert-${type} alert-dismissible fade show" role="alert">
-            ${message}
-            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-        </div>`;
-    setTimeout(() => {
-        const alert = container.querySelector('.alert');
-        if (alert) bootstrap.Alert.getOrCreateInstance(alert).close();
-    }, 4000);
-}
-
 // ── Render ─────────────────────────────────────────────────────────────────
 
 function renderStats(stats) {
@@ -25,22 +10,6 @@ function renderStats(stats) {
 }
 
 // ── Load ───────────────────────────────────────────────────────────────────
-
-async function loadExpiringSoonBanner() {
-    try {
-        const items = await getExpiringSoon();
-        const banner = document.getElementById('expiring-soon-banner');
-        const message = document.getElementById('expiring-soon-message');
-        if (items.length > 0) {
-            message.textContent = `${items.length} item${items.length > 1 ? 's are' : ' is'} expiring within 3 days.`;
-            banner.classList.remove('d-none');
-        } else {
-            banner.classList.add('d-none');
-        }
-    } catch (error) {
-        // Silently fail — banner is non-critical
-    }
-}
 
 async function loadStats() {
     try {
