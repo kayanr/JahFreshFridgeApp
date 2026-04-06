@@ -178,7 +178,7 @@ function renderWasteCards(waste) {
     }
     const categoryEl = document.getElementById('waste-most-category');
     if (waste.mostWastedCategory) {
-        categoryEl.textContent = `${formatCategory(waste.mostWastedCategory)} (${waste.mostWastedCategoryCount} item${waste.mostWastedCategoryCount !== 1 ? 's' : ''})`;
+        categoryEl.textContent = `${formatCategory(waste.mostWastedCategory)} (${waste.mostWastedCategoryCount} ${waste.mostWastedCategoryCount === 1 ? 'item' : 'items'})`;
     } else {
         categoryEl.textContent = '—';
     }
@@ -350,14 +350,17 @@ function exportFullReport() {
         lastFetchedItems.forEach(item => {
             const expiry = new Date(item.expiryDate + 'T00:00:00');
             const days = Math.round((expiry - today) / (1000 * 60 * 60 * 24));
-            const daysLabel = days === 0 ? 'Today' : days > 0 ? `${days} day(s)` : `${Math.abs(days)} day(s) ago`;
+            const absDays = Math.abs(days);
+            const daysLabel = days === 0 ? 'Today'
+                : days > 0 ? `${days} ${days === 1 ? 'day' : 'days'}`
+                : `${absDays} ${absDays === 1 ? 'day' : 'days'} ago`;
             sections.push([
                 `"${item.name}"`,
                 formatCategory(item.category),
-                formatDate(item.expiryDate),
+                `"${formatDate(item.expiryDate)}"`,
                 daysLabel,
                 item.quantity,
-                item.status.replace('_', ' ')
+                item.status.replaceAll('_', ' ')
             ].join(','));
         });
     }
@@ -408,7 +411,7 @@ function exportFullReport() {
 }
 
 function triggerDownload(csv) {
-    const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+    const blob = new Blob(['\uFEFF' + csv], { type: 'text/csv;charset=utf-8;' });
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;
