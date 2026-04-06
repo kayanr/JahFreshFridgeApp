@@ -47,7 +47,10 @@
                         </div>
                         <div class="mb-3">
                             <label for="password" class="form-label">Password</label>
-                            <input type="password" class="form-control" id="password" required minlength="8">
+                            <div class="input-group">
+                                <input type="password" class="form-control" id="password" required minlength="8">
+                                <button class="btn btn-outline-secondary" type="button" id="toggle-password">Show</button>
+                            </div>
                             <div class="form-text">Minimum 8 characters.</div>
                         </div>
                         <button type="submit" class="btn btn-slate w-100">Create Account</button>
@@ -70,6 +73,13 @@
     if (localStorage.getItem('token')) {
         window.location.href = '/fooditems.html';
     }
+
+    document.getElementById('toggle-password').addEventListener('click', function () {
+        const input = document.getElementById('password');
+        const isHidden = input.type === 'password';
+        input.type = isHidden ? 'text' : 'password';
+        this.textContent = isHidden ? 'Hide' : 'Show';
+    });
 
     document.getElementById('register-form').addEventListener('submit', async (e) => {
         e.preventDefault();
