@@ -49,14 +49,14 @@
                         <div class="mb-3">
                             <label for="password" class="form-label">Password</label>
                             <div class="input-group">
-                                <input type="password" class="form-control" id="password" required minlength="8">
+                                <input type="password" class="form-control" id="password" required minlength="8" autocomplete="new-password">
                                 <button class="btn btn-outline-secondary" type="button" id="toggle-password">Show</button>
                             </div>
                             <div class="form-text">Minimum 8 characters.</div>
                         </div>
                         <div class="mb-3">
                             <label for="confirm-password" class="form-label">Confirm Password</label>
-                            <input type="password" class="form-control" id="confirm-password" required>
+                            <input type="password" class="form-control" id="confirm-password" required autocomplete="new-password">
                             <div class="invalid-feedback">Passwords do not match.</div>
                         </div>
                         <button type="submit" class="btn btn-slate w-100">Create Account</button>
