@@ -21,7 +21,7 @@
                 <li class="nav-item"><a class="nav-link" href="/dashboard.html">Dashboard</a></li>
                 <li class="nav-item"><a class="nav-link" href="/fooditems.html">My Fridge</a></li>
                 <li class="nav-item"><a class="nav-link active" href="/reports.html">Reports</a></li>
-                <li class="nav-item"><a class="nav-link" href="#" onclick="logout()">Logout</a></li>
+                <li class="nav-item"><a class="nav-link" href="#" id="nav-logout">Logout</a></li>
             </ul>
         </div>
     </div>
@@ -283,6 +283,10 @@
 <script>
     requireAuth();
     document.getElementById('year').textContent = new Date().getFullYear();
+    document.getElementById('nav-logout').addEventListener('click', (e) => {
+        e.preventDefault();
+        logout();
+    });
 </script>
 </body>
 </html>

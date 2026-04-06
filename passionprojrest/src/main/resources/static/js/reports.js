@@ -170,11 +170,11 @@ function renderWasteCards(waste) {
     if (waste.wasteRateTrend === null || waste.wasteRateTrend === undefined) {
         trendEl.textContent = '';
     } else if (waste.wasteRateTrend < 0) {
-        trendEl.innerHTML = `<span style="color:#a8f0c6;">↓ ${Math.abs(waste.wasteRateTrend)}% from last month</span>`;
+        trendEl.innerHTML = `<span class="trend-down">↓ ${Math.abs(waste.wasteRateTrend)}% from last month</span>`;
     } else if (waste.wasteRateTrend > 0) {
-        trendEl.innerHTML = `<span style="color:#f8d7da;">↑ ${waste.wasteRateTrend}% from last month</span>`;
+        trendEl.innerHTML = `<span class="trend-up">↑ ${waste.wasteRateTrend}% from last month</span>`;
     } else {
-        trendEl.innerHTML = `<span style="color:#fff9c4;">→ Same as last month</span>`;
+        trendEl.innerHTML = `<span class="trend-flat">→ Same as last month</span>`;
     }
     const categoryEl = document.getElementById('waste-most-category');
     if (waste.mostWastedCategory) {
