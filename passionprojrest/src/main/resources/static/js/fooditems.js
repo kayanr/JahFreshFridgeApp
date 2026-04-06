@@ -86,10 +86,10 @@ function renderTable(items) {
 
 // ── Data loading ───────────────────────────────────────────────────────────
 
-async function loadFoodItems(page = 0) {
+async function loadFoodItems(page = 0, size = 5) {
     const tbody = document.getElementById('fooditems-table-body');
     try {
-        const data = await getAllFoodItems(page);
+        const data = await getAllFoodItems(page, size);
         allItems = data.content;
         currentPage = data.number;
         totalPages = data.totalPages;
@@ -296,5 +296,7 @@ if (filterParam) {
 }
 
 loadCategories();
-loadFoodItems();
+// If a filter is pre-set from the URL, fetch a large page so all matching
+// items are visible — client-side filtering only works on loaded items.
+loadFoodItems(0, filterParam ? 1000 : 5);
 loadExpiringSoonBanner();
