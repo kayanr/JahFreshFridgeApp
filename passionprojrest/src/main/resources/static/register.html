@@ -53,6 +53,11 @@
                             </div>
                             <div class="form-text">Minimum 8 characters.</div>
                         </div>
+                        <div class="mb-3">
+                            <label for="confirm-password" class="form-label">Confirm Password</label>
+                            <input type="password" class="form-control" id="confirm-password" required>
+                            <div class="invalid-feedback">Passwords do not match.</div>
+                        </div>
                         <button type="submit" class="btn btn-slate w-100">Create Account</button>
                     </form>
 
@@ -80,6 +85,15 @@
         input.type = isHidden ? 'text' : 'password';
         this.textContent = isHidden ? 'Hide' : 'Show';
     });
+
+    function validatePasswordMatch() {
+        const password = document.getElementById('password').value;
+        const confirm = document.getElementById('confirm-password');
+        confirm.setCustomValidity(confirm.value !== password ? 'Passwords do not match.' : '');
+    }
+
+    document.getElementById('password').addEventListener('input', validatePasswordMatch);
+    document.getElementById('confirm-password').addEventListener('input', validatePasswordMatch);
 
     document.getElementById('register-form').addEventListener('submit', async (e) => {
         e.preventDefault();
