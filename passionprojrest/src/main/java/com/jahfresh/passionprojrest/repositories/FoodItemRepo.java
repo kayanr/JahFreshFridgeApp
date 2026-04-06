@@ -39,7 +39,7 @@ public interface FoodItemRepo extends JpaRepository<FoodItem, Long> {
     @Query(value = "SELECT * FROM food_items WHERE status NOT IN ('CONSUMED', 'DISCARDED') " +
             "AND user_id = (SELECT id FROM users WHERE username = :username) " +
             "ORDER BY CASE status WHEN 'EXPIRED' THEN 0 WHEN 'EXPIRING_SOON' THEN 1 ELSE 2 END, " +
-            "ABS(DATEDIFF(expiry_date, CURRENT_DATE)) ASC LIMIT 5",
+            "ABS(DATEDIFF(expiry_date, CURRENT_DATE)) ASC",
             nativeQuery = true)
     List<FoodItem> findItemsRequiringAttention(@Param("username") String username);
 
