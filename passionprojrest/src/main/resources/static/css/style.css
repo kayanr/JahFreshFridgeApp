@@ -89,14 +89,18 @@ main {
 
 /* ── Buttons ──────────────────────────────────────────────────────────────── */
 
-.btn-success {
+.btn-success,
+.btn-slate {
     background-color: #2c3e50;
     border-color: #2c3e50;
+    color: #fff;
 }
 
-.btn-success:hover {
+.btn-success:hover,
+.btn-slate:hover {
     background-color: #1a252f;
     border-color: #1a252f;
+    color: #fff;
 }
 
 .btn-outline-primary {
