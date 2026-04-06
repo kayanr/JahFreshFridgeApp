@@ -74,8 +74,7 @@ public class ReportController {
     @GetMapping("/category-summary")
     public List<CategorySummaryItem> getCategorySummary() {
         String username = userService.getCurrentUsername();
-        List<FoodStatus> excluded = List.of(FoodStatus.CONSUMED, FoodStatus.DISCARDED);
-        return foodItemRepo.findCategorySummary(username, excluded);
+        return foodItemRepo.findCategorySummary(username, List.of());
     }
 
     @GetMapping("/monthly-activity")
