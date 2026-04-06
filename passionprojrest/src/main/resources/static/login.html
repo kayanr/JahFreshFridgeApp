@@ -50,6 +50,11 @@
 </main>
 
 <script>
+    // Redirect already-authenticated users
+    if (localStorage.getItem('token')) {
+        window.location.href = '/fooditems.html';
+    }
+
     document.getElementById('login-form').addEventListener('submit', async (e) => {
         e.preventDefault();
 
