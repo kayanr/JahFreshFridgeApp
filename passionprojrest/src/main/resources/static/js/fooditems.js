@@ -42,29 +42,6 @@ const CATEGORY_LABEL = {
     OTHER:      'Other'
 };
 
-// ── Helpers ────────────────────────────────────────────────────────────────
-
-function formatDate(dateStr) {
-    if (!dateStr) return '—';
-    const date = dateStr.includes('T') ? new Date(dateStr) : new Date(dateStr + 'T00:00:00');
-    return date.toLocaleDateString('en-US', {
-        year: 'numeric', month: 'short', day: 'numeric'
-    });
-}
-
-function showAlert(message, type = 'success') {
-    const container = document.getElementById('alert-container');
-    container.innerHTML = `
-        <div class="alert alert-${type} alert-dismissible fade show" role="alert">
-            ${message}
-            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-        </div>`;
-    setTimeout(() => {
-        const alert = container.querySelector('.alert');
-        if (alert) bootstrap.Alert.getOrCreateInstance(alert).close();
-    }, 4000);
-}
-
 // ── Table rendering ────────────────────────────────────────────────────────
 
 function renderTable(items) {
@@ -109,10 +86,10 @@ function renderTable(items) {
 
 // ── Data loading ───────────────────────────────────────────────────────────
 
-async function loadFoodItems(page = 0) {
+async function loadFoodItems(page = 0, size = 5) {
     const tbody = document.getElementById('fooditems-table-body');
     try {
-        const data = await getAllFoodItems(page);
+        const data = await getAllFoodItems(page, size);
         allItems = data.content;
         currentPage = data.number;
         totalPages = data.totalPages;
@@ -295,24 +272,6 @@ document.getElementById('btn-refresh-statuses').addEventListener('click', async 
     }
 });
 
-// ── Expiring soon banner ────────────────────────────────────────────────────
-
-async function loadExpiringSoonBanner() {
-    try {
-        const items = await getExpiringSoon();
-        const banner = document.getElementById('expiring-soon-banner');
-        const message = document.getElementById('expiring-soon-message');
-        if (items.length > 0) {
-            message.textContent = `${items.length} item${items.length > 1 ? 's are' : ' is'} expiring within 3 days.`;
-            banner.classList.remove('d-none');
-        } else {
-            banner.classList.add('d-none');
-        }
-    } catch (error) {
-        // Silently fail — banner is non-critical
-    }
-}
-
 // ── Init ───────────────────────────────────────────────────────────────────
 
 async function loadCategories() {
@@ -337,5 +296,7 @@ if (filterParam) {
 }
 
 loadCategories();
-loadFoodItems();
+// If a filter is pre-set from the URL, fetch a large page so all matching
+// items are visible — client-side filtering only works on loaded items.
+loadFoodItems(0, filterParam ? 1000 : 5);
 loadExpiringSoonBanner();

@@ -170,11 +170,11 @@ function renderWasteCards(waste) {
     if (waste.wasteRateTrend === null || waste.wasteRateTrend === undefined) {
         trendEl.textContent = '';
     } else if (waste.wasteRateTrend < 0) {
-        trendEl.innerHTML = `<span style="color:#a8f0c6;">↓ ${Math.abs(waste.wasteRateTrend)}% from last month</span>`;
+        trendEl.innerHTML = `<span class="trend-down">↓ ${Math.abs(waste.wasteRateTrend)}% from last month</span>`;
     } else if (waste.wasteRateTrend > 0) {
-        trendEl.innerHTML = `<span style="color:#f8d7da;">↑ ${waste.wasteRateTrend}% from last month</span>`;
+        trendEl.innerHTML = `<span class="trend-up">↑ ${waste.wasteRateTrend}% from last month</span>`;
     } else {
-        trendEl.innerHTML = `<span style="color:#fff9c4;">→ Same as last month</span>`;
+        trendEl.innerHTML = `<span class="trend-flat">→ Same as last month</span>`;
     }
     const categoryEl = document.getElementById('waste-most-category');
     if (waste.mostWastedCategory) {
@@ -307,13 +307,6 @@ function formatDaysRemaining(dateStr) {
     return `<span class="badge bg-danger">${Math.abs(days)} day${Math.abs(days) === 1 ? '' : 's'} ago</span>`;
 }
 
-function formatDate(dateStr) {
-    if (!dateStr) return '—';
-    return new Date(dateStr + 'T00:00:00').toLocaleDateString('en-US', {
-        year: 'numeric', month: 'short', day: 'numeric'
-    });
-}
-
 function formatStatusBadge(status) {
     const badges = {
         FRESH: 'bg-success',
@@ -424,11 +417,3 @@ function triggerDownload(csv) {
     URL.revokeObjectURL(url);
 }
 
-function showAlert(message, type) {
-    const container = document.getElementById('alert-container');
-    container.innerHTML = `
-        <div class="alert alert-${type} alert-dismissible fade show" role="alert">
-            ${message}
-            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-        </div>`;
-}

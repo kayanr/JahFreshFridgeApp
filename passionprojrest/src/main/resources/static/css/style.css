@@ -119,6 +119,12 @@ footer {
     margin-top: auto;
 }
 
+/* ── Waste trend indicators ───────────────────────────────────────────────── */
+
+.trend-down  { color: #a8f0c6; }
+.trend-up    { color: #f8d7da; }
+.trend-flat  { color: #fff9c4; }
+
 /* ── Alert ────────────────────────────────────────────────────────────────── */
 
 #alert-container {
